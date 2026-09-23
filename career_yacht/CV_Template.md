@@ -50,8 +50,12 @@ Phone | Email | Instagram @[handle] | Nationalität: Deutsch
 *   Food Hygiene Level 2 - [Datum]
 *   *Ship's Cook Certificate - geplant Jahr 2*
 
-**REFERENZEN**
-Captain / Owner auf Anfrage | Letzter Arbeitgeber: [Name, Telefon]
+**RESILIENCE & WORK ETHIC**
+*   Accustomed to high-intensity seasons - 70-80h weeks and 300h+ months since age 18 without compromising quality. Used to delivering experiences when infrastructure fails. Yacht rotation is efficiency, not stress.
+
+**REFERENZEN - DEIN JOKER**
+*   Personal Referral: [Name], Technical Construction Head, M/Y [Yacht Name], 3 years Superyacht - contact on request (internal referral)
+*   Letzter Arbeitgeber: [Name, Telefon] - 11 Jahre Head Chef, Loyalität belegt
 
 **FOTOS ANHANG SEITE 2 (Optional für Agentur-Mail):**
 Seite 2 nur Fotos, je 6 Stück mit kurzer Caption: "Bluefin Sashimi, Trüffel flambiert" etc. Keine Texte mehr.
