@@ -1460,7 +1460,8 @@ function update(dt){
       canvas.animate([{filter:'brightness(1)'},{filter:'brightness(1.6)'}],{duration:120});
     } else if(e.hp<=0){
       // died
-      const goldGain = e.isBoss? 55 : e.type==='fast'? 14 : 10 + Math.floor(state.wave*0.7);
+      let goldGain = e.isBoss? 55 : e.type==='fast'? 14 : 10 + Math.floor(state.wave*0.7);
+      if(state.hero==='dboy') goldGain = Math.floor(goldGain*1.18);
       state.gold += goldGain;
       state.kills++;
       spawnParticles(e.x,e.y,12, e.isBoss?'#ff006a':'#ffd600', `+${goldGain}₵`);
