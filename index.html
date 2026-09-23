@@ -278,6 +278,44 @@ a{color:inherit}
 .banner p{ margin:0; font-size:12px; color:#d6d8dd}
 .banner strong{ color:var(--yellow-2); font-family:'Russo One',sans-serif}
 @media(max-width:820px){ .banner{ left:12px; right:12px; padding:10px} .banner p{ font-size:11px}}
+/* ===== MOBILE PREMIUM HUD - auto-hide + bottom drawer (Bloons/Clash style) ===== */
+@media(max-width:820px){
+  /* board takes priority, fills viewport */
+  .shell{ padding:8px; gap:10px}
+  .board{ border-radius:16px; min-height:52vh}
+  /* HUD becomes floating overlay, auto-fades */
+  .topbar{ position:fixed; top:0; left:0; right:0; z-index:35; transition: transform .35s ease, opacity .35s ease}
+  .topbar.hud-hidden{ transform: translateY(-100%); opacity:0; pointer-events:none}
+  .topbar.hud-peek{ opacity:.92}
+  body{ padding-top: calc(56px + var(--safe-top)) }
+  /* shop becomes bottom drawer */
+  #shopCard{
+    position:fixed; left:8px; right:8px; bottom: calc(8px + var(--safe-bottom)); z-index:32;
+    max-height:62vh; overflow:auto; -webkit-overflow-scrolling:touch;
+    transform: translateY(calc(100% + 20px)); opacity:0; pointer-events:none;
+    transition: transform .38s cubic-bezier(.2,.8,.2,1), opacity .25s;
+    box-shadow: 0 20px 60px rgba(0,0,0,.7);
+  }
+  #shopCard.drawer-open{ transform: translateY(0); opacity:1; pointer-events:auto}
+  /* side-right becomes stacked but also tucked */
+  .side-right{ gap:10px}
+  .side-right .card{ border-radius:14px}
+  /* floating shop FAB */
+  .shop-fab{
+    position:fixed; left:50%; bottom: calc(18px + var(--safe-bottom)); transform: translateX(-50%);
+    z-index:33; display:flex; align-items:center; gap:8px;
+    background: linear-gradient(180deg, #f5c518 0%, #ffb800 100%); color:#0a0a0a;
+    border:1.5px solid #000; border-radius:999px; padding:10px 18px;
+    font-family:'Russo One',sans-serif; font-size:13px; letter-spacing:.6px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.5), 0 1px 0 rgba(255,255,255,.4) inset;
+    cursor:pointer; transition: all .15s;
+  }
+  .shop-fab:active{ transform: translateX(-50%) translateY(2px)}
+  .shop-fab.has-selection{ background: linear-gradient(180deg, #5af2ff 0%, #18e8ff 100%)}
+}
+/* desktop keeps classic layout */
+.shop-fab{ display:none}
+@media(max-width:820px){ .shop-fab{ display:flex } }
 </style>
 </head>
 <body>
@@ -379,6 +417,8 @@ a{color:inherit}
     </div>
   </aside>
 </div>
+
+<button class="shop-fab" id="shopFab" aria-label="Open shop"><span id="shopFabIcon">🛒</span> <span id="shopFabText">SHOP</span> <span id="shopFabBadge" style="background:#000; color:var(--yellow); font-size:10px; padding:2px 6px; border-radius:999px; border:1px solid rgba(255,255,255,.15); display:none">1</span></button>
 
 <!-- HERO MODAL -->
 <div class="modal open" id="heroModal" role="dialog" aria-modal="true">
@@ -732,7 +772,15 @@ function update(gameDt,realDt){
 }
 function spawnEnemy(isBoss,isFast){ const base=32+state.wave*14+state.wave*state.wave*1.1; let hp=base, sp=48+state.wave*1.4, ty='normal'; if(isFast){hp*=.62; sp*=1.55; ty='fast'} if(isBoss){hp*=3.2; sp*=.68} state.enemies.push({x:pathSegments[0].a.x,y:pathSegments[0].a.y,progress:0,hp,maxHp:hp,speed:sp,type:ty,isBoss:!!isBoss,slowTimer:0}) }
 function draw(){ ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,canvas.width,canvas.height); ctx.restore(); drawBackground(); drawTowers(); drawEnemies(); drawProjectiles(); drawParticles() }
-function getCanvasPos(e){ const r=canvas.getBoundingClientRect(), W=960,H=560, cx=e.touches?e.touches[0].clientX:e.clientX, cy=e.touches?e.touches[0].clientY:e.clientY, sx=W/r.width, sy=H/r.height, x=(cx-r.left)*sx, y=(cy-r.top)*sy; return {x,y,gridX:Math.floor(x/CELL),gridY:Math.floor(y/CELL)} }
+function getCanvasPos(e){
+  const r=canvas.getBoundingClientRect(), W=960, H=560;
+  let cx, cy;
+  if(e.changedTouches && e.changedTouches.length){ cx=e.changedTouches[0].clientX; cy=e.changedTouches[0].clientY; }
+  else if(e.touches && e.touches.length){ cx=e.touches[0].clientX; cy=e.touches[0].clientY; }
+  else { cx=e.clientX; cy=e.clientY; }
+  const sx=W/r.width, sy=H/r.height, x=(cx-r.left)*sx, y=(cy-r.top)*sy;
+  return {x,y,gridX:Math.floor(x/CELL),gridY:Math.floor(y/CELL)}
+}
 function handleMove(e){ if(e.touches) e.preventDefault(); const p=getCanvasPos(e); state.mouse.x=p.x; state.mouse.y=p.y; state.mouse.gridX=p.gridX; state.mouse.gridY=p.gridY; state.mouse.inside= p.x>=0&&p.y>=0&&p.x<960&&p.y<560; state.hoverValid=isValidPlacement(p.gridX,p.gridY); canvas.style.cursor= state.selectedTowerType? (state.hoverValid?'copy':'not-allowed'):'default' }
 function handleTap(e){
   if(state.gameOver) return; unlockAudio(); if(e.type==='touchend') e.preventDefault(); const p=getCanvasPos(e);
@@ -786,6 +834,166 @@ document.addEventListener('touchmove',e=>{
 },{passive:false});
 updateHeroRight(); renderShop(); updateHUD(); updateSelectionUI(); updateSkillButton(); updateCancelBtn(); buildPath(); setupHiDPI(); requestAnimationFrame(loop);
 document.getElementById('canvasWrap').addEventListener('contextmenu',e=>e.preventDefault());
+/* ===== MOBILE PREMIUM HUD — drawer + auto-hide (auto-fades when not needed) ===== */
+(function(){
+  const isMobile = () => window.matchMedia('(max-width:820px)').matches;
+  const topbar = document.querySelector('.topbar');
+  const shopCard = document.getElementById('shopCard');
+  const fab = document.getElementById('shopFab');
+  const fabText = document.getElementById('shopFabText');
+  const fabBadge = document.getElementById('shopFabBadge');
+  const fabIcon = document.getElementById('shopFabIcon');
+  let hudTimer=null;
+  let drawerOpen=false;
+
+  function updateFab(){
+    const sel = state.selectedTowerType;
+    if(sel){
+      const tp=towerTypes.find(x=>x.id===sel);
+      fab.classList.add('has-selection');
+      fabIcon.textContent='📍';
+      fabText.textContent = isMobile() ? (currentLang==='es'?'COLOCAR':'PLACE') + ' ' + (tp?t(tp.nameKey):'').toUpperCase() : 'SHOP';
+      fabBadge.style.display='block';
+      fabBadge.textContent='●';
+    } else {
+      fab.classList.remove('has-selection');
+      fabIcon.textContent='🛒';
+      fabText.textContent='SHOP';
+      fabBadge.style.display = state.gold<60 ? 'none' : 'none';
+    }
+    // also reflect drawer state
+    if(drawerOpen){ fabIcon.textContent='✕'; fabText.textContent= currentLang==='es'?'CERRAR':'CLOSE'; fab.classList.remove('has-selection'); }
+  }
+
+  function setDrawer(open){
+    drawerOpen=open;
+    if(!shopCard) return;
+    shopCard.classList.toggle('drawer-open', open);
+    if(fab) fab.setAttribute('aria-expanded', open?'true':'false');
+    updateFab();
+    if(open) scheduleHideHUD(true); // keep HUD visible when drawer open
+  }
+  // expose for other handlers
+  window._shopDrawer = { setDrawer, updateFab, get open(){return drawerOpen}};
+
+  if(fab){
+    fab.addEventListener('click',e=>{
+      e.preventDefault(); e.stopPropagation();
+      // if placing mode active, cancel first
+      if(state.selectedTowerType && !drawerOpen){ // placing -> cancel
+        if(!drawerOpen){ state.selectedTowerType=null; updateSelectionUI(); renderShop(); updateCancelBtn(); showTapHint(''); updateFab(); return; }
+      }
+      // toggle drawer
+      setDrawer(!drawerOpen);
+      if(navigator.vibrate) navigator.vibrate(15);
+      scheduleHideHUD(true);
+    });
+    // also hook renderShop/cancel to update fab
+    const origRenderShop = window.renderShop;
+  }
+
+  // HUD auto-hide
+  function scheduleHideHUD(immediateShow){
+    if(!isMobile()){ topbar.classList.remove('hud-hidden'); return; }
+    if(drawerOpen){ topbar.classList.remove('hud-hidden'); return; }
+    if(immediateShow) topbar.classList.remove('hud-hidden');
+    clearTimeout(hudTimer);
+    hudTimer=setTimeout(()=>{
+      if(!drawerOpen && !document.querySelector('.modal.open') && !state.gameOver){
+        topbar.classList.add('hud-hidden');
+      }
+    }, 3000);
+  }
+  function pokeHUD(){ scheduleHideHUD(true); }
+  ['touchstart','touchmove','click','mousemove','keydown'].forEach(ev=>{
+    window.addEventListener(ev, pokeHUD, {passive:true});
+  });
+  // tapping board should close drawer
+  canvas.addEventListener('touchstart',()=>{ if(drawerOpen) setDrawer(false); pokeHUD(); }, {passive:true});
+  canvas.addEventListener('click',()=>{ if(drawerOpen) setDrawer(false); });
+  // outside tap closes drawer
+  document.addEventListener('touchstart',e=>{
+    if(!isMobile()||!drawerOpen) return;
+    if(e.target.closest('#shopCard')||e.target.closest('#shopFab')) return;
+    if(e.target.closest('.topbar')||e.target.closest('.modal')) return;
+    setDrawer(false);
+  }, {passive:true});
+  document.addEventListener('click',e=>{
+    if(!isMobile()||!drawerOpen) return;
+    if(e.target.closest('#shopCard')||e.target.closest('#shopFab')) return;
+    setDrawer(false);
+  });
+
+  // initial HUD schedule
+  scheduleHideHUD(false);
+  setTimeout(()=>scheduleHideHUD(false), 3200);
+
+  // patch updateFab into renderShop lifecycle without recursion
+  const _origRenderShop = renderShop;
+  window.renderShop = function(){ _origRenderShop(); updateFab(); };
+  const _origUpdateSelectionUI = updateSelectionUI;
+  window.updateSelectionUI = function(){ _origUpdateSelectionUI(); updateFab(); };
+  // also watch selectedTowerType changes via interval minimal overhead
+  setInterval(updateFab, 600);
+  updateFab();
+
+  // expose poke
+  window._pokeHUD = pokeHUD;
+})();
+/* Improve tap hit-area for towers on touch — forgive ~0.7 cells */
+(function(){
+  const origHandleTap = handleTap;
+  // replace handleTap globally with forgiving version
+  window.handleTap = function(e){
+    if(state.gameOver) return; unlockAudio(); if(e.type==='touchend') e.preventDefault();
+    const p=getCanvasPos(e);
+    // forgiving tower find: nearest tower within 0.85*CELL
+    const findTowerNear = (x,y)=>{
+      let best=null, bestD=Infinity;
+      state.towers.forEach(t=>{
+        const d=Math.hypot(t.x - x, t.y - y);
+        if(d < bestD && d < CELL*0.85){ bestD=d; best=t; }
+      });
+      return best;
+    };
+    if(state.selectedTowerType){
+      const ok=placeTower(p.gridX,p.gridY);
+      if(ok){
+        const tp=towerTypes.find(x=>x.id===state.selectedTowerType);
+        if(tp && state.gold < tp.cost){ state.selectedTowerType=null; showTapHint(''); }
+        renderShop(); updateSelectionUI(); updateCancelBtn();
+        if(window._shopDrawer && window.matchMedia('(max-width:820px)').matches){
+          // keep drawer open for next purchase, but hide hint
+        }
+      } else {
+        const near=findTowerNear(p.x,p.y);
+        if(near){ state.selectedTower=near; state.selectedTowerType=null; updateSelectionUI(); renderShop(); updateCancelBtn(); showTapHint(''); if(window._shopDrawer) window._shopDrawer.setDrawer(false); }
+      }
+      if(window._pokeHUD) window._pokeHUD();
+      return;
+    } else {
+      const near=findTowerNear(p.x,p.y);
+      if(near){ state.selectedTower=near; if(navigator.vibrate) navigator.vibrate(15); }
+      else {
+        // also check exact cell fallback (existing)
+        const cl=state.towers.find(t=>t.gridX===p.gridX&&t.gridY===p.gridY);
+        if(cl) state.selectedTower=cl;
+        else state.selectedTower=null;
+      }
+      updateSelectionUI();
+      if(window._pokeHUD) window._pokeHUD();
+      if(near && window._shopDrawer && window.matchMedia('(max-width:820px)').matches){
+        // close drawer when selecting tower to see stats
+        window._shopDrawer.setDrawer(false);
+      }
+    }
+  };
+  // rebind listeners to new handleTap (keep old move)
+  canvas.removeEventListener('click', origHandleTap);
+  canvas.removeEventListener('touchend', origHandleTap);
+  canvas.addEventListener('click', window.handleTap);
+  canvas.addEventListener('touchend', window.handleTap, {passive:false});
+})();
 </script>
 </body>
 </html>
