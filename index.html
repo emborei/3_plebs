@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>3 PLEBS — STREET DEFENSE</title>
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Bebas+Neue&family=Russo+One&family=Press+Start+2P&family=Teko:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f0f0f;
+  --concrete:#1a1a1e;
+  --panel:#222228;
+  --panel2:#2a2a30;
+  --line:#3a3a44;
+  --yellow:#ffd600;
+  --orange:#ff6a00;
+  --cyan:#00e5ff;
+  --magenta:#ff006a;
+  --green:#00e676;
+  --text:#f5f5f5;
+  --muted:#9aa0a6;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:'Teko',sans-serif;overflow-x:hidden}
+body{
+  background:
+    radial-gradient(1200px 600px at 20% -10%, #2a1a00 0%, transparent 60%),
+    radial-gradient(900px 500px at 90% 0%, #002033 0%, transparent 60%),
+    linear-gradient(180deg,#141416 0%, #0a0a0b 100%);
+}
+/* header */
+.topbar{
+  height:62px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;
+  background: linear-gradient(180deg,#1a1a1e,#121214);
+  border-bottom:4px solid #000;
+  box-shadow:0 8px 24px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.08);
+  position:sticky;top:0;z-index:30;
+}
+.brand{
+  display:flex;align-items:center;gap:12px;
+}
+.logo-badge{
+  width:46px;height:46px;background:var(--yellow);color:#000;display:grid;place-items:center;
+  font-family:'Permanent Marker',cursive;font-size:22px;line-height:1;transform:rotate(-3deg);
+  box-shadow:4px 4px 0 #000, inset 0 -3px 0 rgba(0,0,0,.15);
+  border:2px solid #000;
+}
+.brand h1{
+  font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;font-size:30px;margin:0;line-height:1;
+  text-shadow:2px 2px 0 #000;
+}
+.brand h1 span{color:var(--yellow)}
+.brand small{font-family:'Russo One',sans-serif;font-size:10px;letter-spacing:2px;color:var(--cyan);display:block;margin-top:-2px;opacity:.9}
+.hud{
+  display:flex;align-items:center;gap:10px;
+}
+.hud-pill{
+  display:flex;align-items:center;gap:8px;background:#000;border:2px solid #333;border-radius:999px;padding:6px 14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+  min-width:110px;justify-content:space-between;
+}
+.hud-pill .icon{width:22px;height:22px;display:grid;place-items:center;background:#1a1a1a;border:1px solid #333;border-radius:50%;font-size:13px}
+.hud-pill strong{font-family:'Russo One',sans-serif;font-size:16px;color:var(--yellow);letter-spacing:.5px}
+.hud-pill span.label{font-size:11px;letter-spacing:1px;color:#aaa;text-transform:uppercase;font-family:'Teko',sans-serif}
+.hud-wave{
+  background:linear-gradient(180deg,#222,#111);border:2px solid var(--yellow);color:#fff;
+}
+.lang-switch{display:flex;gap:6px;margin-left:8px}
+.lang-btn{
+  background:#111;border:2px solid #333;color:#aaa;font-family:'Russo One',sans-serif;font-size:11px;padding:6px 10px;border-radius:8px;cursor:pointer;letter-spacing:1px
+}
+.lang-btn.active{background:var(--yellow);color:#000;border-color:#000;box-shadow:3px 3px 0 #000}
+
+/* layout */
+.wrap{
+  max-width:1360px;margin:0 auto;padding:14px;display:grid;grid-template-columns:250px 1fr 280px;gap:14px;
+}
+@media(max-width:1100px){.wrap{grid-template-columns:220px 1fr} .right-panel{grid-column:1 / -1; display:grid;grid-template-columns:1fr 1fr;gap:14px}}
+@media(max-width:720px){.wrap{grid-template-columns:1fr} .topbar{height:auto;flex-wrap:wrap;padding:10px;gap:8px} .hud{flex-wrap:wrap}}
+
+/* panels */
+.panel{
+  background:linear-gradient(180deg,var(--panel),#19191d);
+  border:3px solid #000;border-radius:16px;box-shadow:8px 8px 0 rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.06);
+  overflow:hidden;position:relative;
+}
+.panel::before{
+  content:"";position:absolute;inset:0;opacity:.07;
+  background-image:repeating-linear-gradient(0deg,transparent 0 2px, rgba(255,255,255,.2) 2px 3px);
+  pointer-events:none;
+}
+.panel-head{
+  font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:18px;padding:12px 14px;
+  background:linear-gradient(90deg,#000,#1a1a1a);border-bottom:3px solid #000;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.panel-head small{font-family:'Teko',sans-serif;font-size:11px;letter-spacing:1.2px;color:var(--yellow);background:#000;padding:2px 8px;border-radius:999px;border:1px solid #333}
+.panel-body{padding:12px;position:relative}
+
+/* shop */
+.shop-item{
+  display:grid;grid-template-columns:56px 1fr;gap:10px;
+  background:linear-gradient(180deg,#2a2a30,#1f1f25);border:2px solid #000;border-radius:12px;padding:8px;
+  margin-bottom:10px;cursor:pointer;transition:.12s;position:relative;
+}
+.shop-item:hover{transform:translateY(-2px);border-color:var(--yellow);box-shadow:4px 4px 0 #000}
+.shop-item.selected{border-color:var(--cyan);background:linear-gradient(180deg,#0f2a33,#1a2330);box-shadow:0 0 0 2px var(--cyan), 4px 4px 0 #000}
+.shop-item.disabled{opacity:.45;filter:grayscale(.2);cursor:not-allowed}
+.shop-icon{
+  width:56px;height:56px;border-radius:10px;background:#000;border:2px solid #333;display:grid;place-items:center;font-size:28px;position:relative;overflow:hidden
+}
+.shop-icon::after{content:"";position:absolute;inset:0;background:radial-gradient(40px 40px at 30% 20%, rgba(255,255,255,.15), transparent 70%)}
+.shop-meta h4{margin:0;font-family:'Russo One',sans-serif;font-size:13px;letter-spacing:.5px;line-height:1}
+.shop-meta p{margin:2px 0 0;font-size:11px;color:#aaa;line-height:1.2;font-family:'Teko',sans-serif;letter-spacing:.3px}
+.shop-meta .row{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+.price{font-family:'Russo One',sans-serif;font-size:13px;color:var(--yellow);display:flex;align-items:center;gap:4px}
+.range-dot{font-size:10px;color:var(--cyan);display:flex;align-items:center;gap:4px;font-family:'Teko',sans-serif}
+.shop-item .cost-warn{position:absolute;right:8px;top:8px;font-size:9px;background:#000;color:var(--magenta);border:1px solid #333;padding:2px 6px;border-radius:999px;font-family:'Russo One',sans-serif}
+
+/* canvas area */
+.stage{
+  display:flex;flex-direction:column;gap:12px;
+}
+.canvas-wrap{
+  position:relative;background:#0b0b0c;border:3px solid #000;border-radius:16px;overflow:hidden;box-shadow:8px 8px 0 rgba(0,0,0,.6);
+}
+#gameCanvas{display:block;width:100%;height:auto;background:#0f1012;image-rendering:pixelated}
+.canvas-overlay{
+  position:absolute;inset:0;pointer-events:none;
+}
+.scanlines{
+  position:absolute;inset:0;background:repeating-linear-gradient(0deg, rgba(0,0,0,0) 0 2px, rgba(0,0,0,.18) 2px 3px);mix-blend-mode:multiply;opacity:.5;pointer-events:none
+}
+.vignette{
+  position:absolute;inset:0;background:radial-gradient(800px 400px at 50% 50%, transparent 60%, rgba(0,0,0,.55) 100%);pointer-events:none
+}
+.bottom-bar{
+  display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center
+}
+@media(max-width:720px){.bottom-bar{grid-template-columns:1fr}}
+.controls{
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center
+}
+.btn{
+  appearance:none;border:3px solid #000;border-radius:12px;padding:10px 16px;font-family:'Russo One',sans-serif;font-size:13px;letter-spacing:.8px;cursor:pointer;
+  box-shadow:4px 4px 0 #000, inset 0 1px 0 rgba(255,255,255,.2);transition:.12s;position:relative;display:inline-flex;align-items:center;gap:8px;justify-content:center
+}
+.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #000}
+.btn-primary{background:var(--yellow);color:#000}
+.btn-cyan{background:var(--cyan);color:#000}
+.btn-magenta{background:var(--magenta);color:#fff}
+.btn-dark{background:#1a1a1e;color:#fff;border-color:#000}
+.btn:disabled{opacity:.5;cursor:not-allowed;filter:grayscale(.3)}
+.btn .cooldown{
+  position:absolute;inset:0;background:rgba(0,0,0,.6);border-radius:9px;display:grid;place-items:center;font-size:14px;color:#fff;letter-spacing:1px
+}
+.skill-btn{
+  min-width:170px;overflow:hidden
+}
+.skill-btn .skill-icon{width:28px;height:28px;background:#000;border:2px solid #fff;border-radius:8px;display:grid;place-items:center;font-size:16px}
+.next-wave-pulse{animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+
+/* right panel */
+.info-hero{
+  display:flex;gap:10px;align-items:center;background:linear-gradient(90deg,#111,#1e1e24);border:2px solid #000;border-radius:12px;padding:10px;margin-bottom:12px
+}
+.info-hero .avatar{width:54px;height:54px;border-radius:12px;border:2px solid #000;overflow:hidden;background:#000;display:grid;place-items:center;font-size:26px;flex-shrink:0}
+.info-hero h4{margin:0;font-family:'Russo One',sans-serif;font-size:13px;line-height:1}
+.info-hero p{margin:2px 0 0;font-size:11px;color:#aaa;line-height:1.2}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.stat-box{background:#111;border:2px solid #222;border-radius:10px;padding:8px;text-align:center}
+.stat-box strong{font-family:'Russo One',sans-serif;font-size:14px;color:var(--yellow)}
+.stat-box span{font-size:10px;letter-spacing:1px;color:#888;text-transform:uppercase;display:block}
+.upgrade-card{
+  background:linear-gradient(180deg,#1e1e24,#151519);border:2px solid #000;border-radius:12px;padding:10px;margin-bottom:10px
+}
+.upgrade-card h5{margin:0;font-family:'Russo One',sans-serif;font-size:12px;display:flex;justify-content:space-between}
+.upgrade-card p{margin:4px 0 8px;font-size:11px;color:#aaa}
+.upgrade-btn{width:100%}
+.range-bar{height:6px;background:#000;border-radius:999px;overflow:hidden;margin:6px 0;border:1px solid #333}
+.range-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));width:30%}
+.wave-list{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.wave-dot{width:28px;height:28px;border-radius:8px;border:2px solid #000;display:grid;place-items:center;font-family:'Russo One',sans-serif;font-size:11px;background:#1a1a1e;color:#666}
+.wave-dot.done{background:var(--green);color:#000}
+.wave-dot.current{background:var(--yellow);color:#000;box-shadow:0 0 12px rgba(255,214,0,.5)}
+.wave-dot.boss{border-color:var(--magenta)}
+
+/* modals */
+.modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(6px);display:none;place-items:center;z-index:50;padding:16px
+}
+.modal.open{display:grid}
+.modal-card{
+  width:min(980px,96vw);background:linear-gradient(180deg,#1e1e24,#121214);border:4px solid #000;border-radius:20px;box-shadow:12px 12px 0 #000, inset 0 1px 0 rgba(255,255,255,.08);overflow:hidden;position:relative
+}
+.modal-card::before{
+  content:"";position:absolute;inset:0;opacity:.04;background-image:repeating-linear-gradient(45deg, #fff 0 1px, transparent 1px 12px);pointer-events:none
+}
+.modal-head{
+  padding:18px 20px;background:linear-gradient(90deg,#000,#1a1a1a);border-bottom:4px solid #000;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px
+}
+.modal-head h2{margin:0;font-family:'Permanent Marker',cursive;font-size:28px;line-height:1;letter-spacing:1px}
+.modal-head h2 span{color:var(--yellow)}
+.hero-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:16px
+}
+@media(max-width:860px){.hero-grid{grid-template-columns:1fr}}
+.hero-card{
+  background:linear-gradient(180deg,#2a2a30,#1b1b1f);border:3px solid #000;border-radius:16px;overflow:hidden;cursor:pointer;transition:.15s;position:relative
+}
+.hero-card:hover{transform:translateY(-4px) rotate(-0.6deg);border-color:var(--yellow);box-shadow:6px 6px 0 #000}
+.hero-card.selected{border-color:var(--cyan);box-shadow:0 0 0 3px var(--cyan), 8px 8px 0 #000}
+.hero-card.selected::after{content:"✓ SELECTED";position:absolute;top:10px;right:10px;background:var(--cyan);color:#000;font-family:'Russo One',sans-serif;font-size:10px;padding:4px 8px;border-radius:999px;border:2px solid #000}
+.hero-visual{
+  height:190px;position:relative;overflow:hidden;background:
+    radial-gradient(300px 180px at 50% 20%, rgba(255,255,255,.08), transparent 70%),
+    linear-gradient(180deg, #1a1a1e 0%, #0f0f13 100%);
+  display:grid;place-items:center;border-bottom:3px solid #000
+}
+.hero-visual .street-tag{
+  position:absolute;inset:auto 10px 10px 10px;height:58px;background:rgba(0,0,0,.65);border:2px solid rgba(255,255,255,.12);border-radius:10px;display:grid;place-items:center;
+  font-family:'Permanent Marker',cursive;font-size:18px;letter-spacing:1px;color:#fff;text-shadow:2px 2px 0 #000;transform:rotate(-1deg)
+}
+.hero-body{padding:12px}
+.hero-body h3{margin:0;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;line-height:1}
+.hero-body h3 em{font-style:normal;color:var(--yellow)}
+.hero-body .subtitle{font-family:'Russo One',sans-serif;font-size:10px;letter-spacing:1.5px;color:var(--cyan);margin:2px 0 6px}
+.hero-body p{margin:0;font-size:12px;color:#bbb;line-height:1.4;font-family:'Teko',sans-serif}
+.hero-stats{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.hero-stat{flex:1;min-width:70px;background:#111;border:2px solid #222;border-radius:10px;padding:6px;text-align:center}
+.hero-stat strong{color:var(--yellow);font-family:'Russo One',sans-serif;font-size:12px}
+.hero-stat span{display:block;font-size:9px;letter-spacing:1px;color:#777;text-transform:uppercase;margin-top:2px}
+.skill-badge{
+  margin-top:10px;background:linear-gradient(90deg,#111,#1a1a1a);border:2px dashed #333;border-radius:10px;padding:8px;display:flex;gap:8px;align-items:center
+}
+.skill-badge .sb-icon{width:36px;height:36px;border-radius:10px;background:var(--yellow);color:#000;display:grid;place-items:center;font-size:18px;border:2px solid #000;flex-shrink:0}
+.skill-badge strong{font-family:'Russo One',sans-serif;font-size:11px;line-height:1}
+.skill-badge small{font-size:11px;color:#aaa;line-height:1.2;display:block}
+/* character drawing */
+.char-flipper, .char-jota, .char-dboy{
+  position:relative;width:120px;height:160px;transform:scale(1.15);filter:drop-shadow(4px 4px 0 #000)
+}
+@media(max-width:860px){.char-flipper,.char-jota,.char-dboy{transform:scale(1)}}
+/* Game over card */
+.result-wrap{padding:20px;text-align:center}
+.result-wrap h2{font-family:'Bebas Neue',sans-serif;font-size:48px;margin:0;line-height:1;letter-spacing:2px}
+.result-wrap p{color:#bbb;font-size:15px;margin:8px 0 14px}
+.big-score{font-family:'Russo One',sans-serif;font-size:32px;color:var(--yellow);background:#000;border:3px solid #222;border-radius:12px;padding:10px 16px;display:inline-block;min-width:220px}
+.graffiti{
+  position:absolute;opacity:.07;font-family:'Permanent Marker',cursive;font-size:90px;transform:rotate(-8deg);pointer-events:none;white-space:nowrap;top:18px;left:-20px
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">
+    <div class="logo-badge">3P</div>
+    <div>
+      <h1>3 PLEBS <span>STREET DEFENSE</span></h1>
+      <small>2003 • BLOCK PARTY EDITION • PREMIUM</small>
+    </div>
+  </div>
+  <div class="hud">
+    <div class="hud-pill" title="Lives">
+      <span class="label" data-i18n="lives">LIVES</span>
+      <span style="display:flex;align-items:center;gap:6px">
+        <span class="icon">♥</span>
+        <strong id="livesVal">20</strong>
+      </span>
+    </div>
+    <div class="hud-pill" title="Gold">
+      <span class="label" data-i18n="gold">GOLD</span>
+      <span style="display:flex;align-items:center;gap:6px">
+        <span class="icon" style="background:linear-gradient(180deg,#ffd600,#ff9d00);color:#000;border-color:#000">●</span>
+        <strong id="goldVal" style="color:var(--yellow)">250</strong>
+      </span>
+    </div>
+    <div class="hud-pill hud-wave" title="Wave">
+      <span class="label" style="color:var(--yellow)" data-i18n="wave">WAVE</span>
+      <strong id="waveVal" style="color:#fff">1 / 15</strong>
+    </div>
+    <div class="lang-switch">
+      <button class="lang-btn active" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="es">ES</button>
+      <button class="lang-btn" data-lang="de">DE</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <!-- left shop -->
+  <div class="panel">
+    <div class="panel-head"><span data-i18n="shop">CORNER SHOP</span> <small>BUY • PLACE</small></div>
+    <div class="panel-body" id="shopBody">
+      <!-- injected -->
+    </div>
+    <div class="panel-body" style="padding-top:0">
+      <div style="background:#000;border:2px solid #222;border-radius:10px;padding:8px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-family:'Russo One',sans-serif;font-size:10px;letter-spacing:1px;color:#888" data-i18n="speed">SPEED</span>
+        <span style="display:flex;gap:6px">
+          <button class="lang-btn active" id="speed1">1×</button>
+          <button class="lang-btn" id="speed2">2×</button>
+        </span>
+      </div>
+      <p style="font-size:11px;color:#777;margin:8px 0 0;line-height:1.3" data-i18n="shopHelp">Pick a tower, then click a free concrete tile. Right-click to cancel. Towers need street cred (gold).</p>
+    </div>
+  </div>
+
+  <!-- center stage -->
+  <div class="stage">
+    <div class="canvas-wrap" id="canvasWrap">
+      <canvas id="gameCanvas" width="960" height="560"></canvas>
+      <div class="scanlines"></div>
+      <div class="vignette"></div>
+      <div class="graffiti">PLEBS • BARRIO • 2003</div>
+      <div id="focusOverlay" style="position:absolute;inset:0;background:radial-gradient(600px 300px at 50% 50%, rgba(0,230,118,.18), transparent 70%);opacity:0;pointer-events:none;transition:.3s"></div>
+    </div>
+    <div class="bottom-bar">
+      <div class="controls">
+        <button class="btn btn-dark skill-btn" id="skillBtn">
+          <span class="skill-icon" id="skillIcon">◉</span>
+          <span style="text-align:left;line-height:1">
+            <strong id="skillName" style="font-size:12px;display:block">GREEN FOCUS</strong>
+            <small id="skillDesc" style="font-size:10px;color:#aaa;letter-spacing:.5px">+35% DMG 6s</small>
+          </span>
+          <span id="skillCooldown" class="cooldown" style="display:none">12s</span>
+        </button>
+        <button class="btn btn-primary" id="nextWaveBtn">▶ <span data-i18n="nextWave">NEXT WAVE</span></button>
+        <button class="btn btn-dark" id="sellBtn" style="display:none">₵ <span data-i18n="sell">SELL</span></button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end">
+        <span style="font-family:'Russo One',sans-serif;font-size:11px;color:#aaa;letter-spacing:1px" data-i18n="waveProgress">PROGRESS</span>
+        <div style="width:160px;height:10px;background:#000;border:2px solid #222;border-radius:999px;overflow:hidden">
+          <div id="waveProgress" style="height:100%;width:0%;background:linear-gradient(90deg,var(--yellow),var(--orange));transition:.3s"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- right panel -->
+  <div class="right-panel">
+    <div class="panel" style="margin-bottom:14px">
+      <div class="panel-head"><span data-i18n="squad">YOUR PLEB</span> <small id="heroNameRight">FLIPPER</small></div>
+      <div class="panel-body" id="rightBody">
+        <div class="info-hero" id="infoHero">
+          <div class="avatar" id="avatarRight">🦊</div>
+          <div>
+            <h4 id="rightHeroTitle">FLIPPER — The Sniper</h4>
+            <p id="rightHeroDesc">Tall & athletic, orange hair. Sees everything from the rooftop.</p>
+          </div>
+        </div>
+
+        <div id="selectedInfo" style="display:none">
+          <div class="upgrade-card">
+            <h5><span id="selTowerName">Tagger</span> <span id="selTowerLvl" style="color:var(--yellow)">Lv.1</span></h5>
+            <p id="selTowerDesc">Short range graffiti damage</p>
+            <div class="stat-grid" style="margin:6px 0">
+              <div class="stat-box"><strong id="statDmg">14</strong><span data-i18n="damage">DMG</span><div class="range-bar"><i id="barDmg" style="width:33%"></i></div></div>
+              <div class="stat-box"><strong id="statRate">1.8/s</strong><span data-i18n="fireRate">RATE</span><div class="range-bar"><i id="barRate" style="width:33%"></i></div></div>
+            </div>
+            <div style="height:6px"></div>
+            <button class="btn btn-cyan upgrade-btn" id="upDmgBtn">⬆ <span data-i18n="upDamage">UP DAMAGE</span> <span id="upDmgCost" style="margin-left:auto;background:#000;color:var(--yellow);padding:2px 8px;border-radius:999px;border:1px solid #333">60₵</span></button>
+            <div style="height:8px"></div>
+            <button class="btn btn-dark upgrade-btn" id="upRateBtn">⚡ <span data-i18n="upRate">UP RATE</span> <span id="upRateCost" style="margin-left:auto;background:#000;color:var(--cyan);padding:2px 8px;border-radius:999px;border:1px solid #333">60₵</span></button>
+          </div>
+          <p style="font-size:11px;color:#666;text-align:center" data-i18n="clickEmpty">Click empty street to deselect</p>
+        </div>
+
+        <div id="defaultInfo">
+          <div class="stat-grid">
+            <div class="stat-box"><strong id="statKills">0</strong><span data-i18n="kills">KILLS</span></div>
+            <div class="stat-box"><strong id="statWaves">0/15</strong><span data-i18n="wavesDone">WAVES</span></div>
+          </div>
+          <div style="background:#111;border:2px solid #222;border-radius:10px;padding:10px">
+            <div style="font-family:'Russo One',sans-serif;font-size:11px;letter-spacing:1px;color:#aaa;display:flex;justify-content:space-between"><span data-i18n="nextEnemies">NEXT ENEMIES</span><span id="nextWaveLabel">8× Grunts</span></div>
+            <div class="wave-list" id="waveDots"></div>
+            <p style="font-size:11px;color:#777;margin:8px 0 0;line-height:1.3" id="tipText">Tip: Sniper loves Flipper’s Focus. Place him on corners for max coverage. Jota’s cyclone clears crowds.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><span data-i18n="howTo">HOW TO BLOCK</span> <small>2003</small></div>
+      <div class="panel-body" style="font-size:12px;color:#bbb;line-height:1.4">
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <span style="min-width:26px;height:26px;background:var(--yellow);color:#000;display:grid;place-items:center;border-radius:8px;border:2px solid #000;font-family:'Russo One',sans-serif">1</span>
+          <span data-i18n="how1"><strong style="color:#fff">Buy</strong> a tower from the left. Each has different range & cost.</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <span style="min-width:26px;height:26px;background:var(--cyan);color:#000;display:grid;place-items:center;border-radius:8px;border:2px solid #000;font-family:'Russo One',sans-serif">2</span>
+          <span data-i18n="how2"><strong style="color:#fff">Place</strong> on grey concrete — not on the orange street path.</span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <span style="min-width:26px;height:26px;background:var(--magenta);color:#fff;display:grid;place-items:center;border-radius:8px;border:2px solid #000;font-family:'Russo One',sans-serif">3</span>
+          <span data-i18n="how3"><strong style="color:#fff">Upgrade</strong> click a tower → boost Damage or Fire Rate. Use your Pleb’s ultimate!</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hero select modal -->
+<div class="modal open" id="heroModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2><span>CHOOSE</span> YOUR PLEB</h2>
+      <div style="display:flex;gap:6px;align-items:center">
+        <span style="font-family:'Russo One',sans-serif;font-size:11px;letter-spacing:1px;color:#aaa" data-i18n="chooseHelp">PICK ONE — EACH CHANGES THE GAME</span>
+        <button class="lang-btn active" data-lang2="en">EN</button>
+        <button class="lang-btn" data-lang2="es">ES</button>
+        <button class="lang-btn" data-lang2="de">DE</button>
+      </div>
+    </div>
+    <div class="hero-grid" id="heroGrid">
+      <!-- Flipper -->
+      <div class="hero-card selected" data-hero="flipper">
+        <div class="hero-visual">
+          <!-- CSS character Flipper -->
+          <div class="char-flipper" aria-hidden="true">
+            <div style="position:absolute;left:38px;top:8px;width:44px;height:52px;background:#ff9a3d;border:3px solid #000;border-radius:18px 18px 14px 14px;overflow:hidden">
+              <div style="position:absolute;top:-6px;left:-4px;width:52px;height:26px;background:#ff6a00;border:3px solid #000;border-radius:20px 20px 6px 6px;transform:rotate(-8deg)"></div>
+              <div style="position:absolute;top:18px;left:8px;width:10px;height:10px;background:#000;border-radius:50%"></div>
+              <div style="position:absolute;top:18px;right:8px;width:10px;height:10px;background:#000;border-radius:50%"></div>
+              <div style="position:absolute;top:32px;left:14px;width:16px;height:6px;background:#000;border-radius:3px"></div>
+              <div style="position:absolute;top:38px;left:10px;width:24px;height:8px;background:#ffd600;border:2px solid #000;border-radius:6px"></div>
+            </div>
+            <div style="position:absolute;left:42px;top:58px;width:36px;height:44px;background:#00e5ff;border:3px solid #000;border-radius:10px"></div>
+            <div style="position:absolute;left:30px;top:62px;width:14px;height:36px;background:#ffcc9a;border:3px solid #000;border-radius:8px;transform:rotate(10deg)"></div>
+            <div style="position:absolute;right:30px;top:62px;width:14px;height:36px;background:#ffcc9a;border:3px solid #000;border-radius:8px;transform:rotate(-10deg)"></div>
+            <div style="position:absolute;left:44px;top:100px;width:16px;height:48px;background:#1a1a1e;border:3px solid #000;border-radius:8px"></div>
+            <div style="position:absolute;right:44px;top:100px;width:16px;height:48px;background:#1a1a1e;border:3px solid #000;border-radius:8px"></div>
+            <div style="position:absolute;left:36px;top:66px;width:18px;height:18px;background:#000;border-radius:6px;display:grid;place-items:center;color:var(--yellow);font-family:'Russo One',sans-serif;font-size:10px">3P</div>
+          </div>
+          <div class="street-tag">FLIPPER — 1.90m • AIR</div>
+        </div>
+        <div class="hero-body">
+          <h3>FLIPPER <em>— THE HAWK</em></h3>
+          <div class="subtitle" data-i18n="flipperSub">TALL • ATHLETIC • ORANGE HAIR • 22</div>
+          <p data-i18n="flipperDesc">Skater vibe, sees three blocks ahead. Rolls a little green to get laser focused.</p>
+          <div class="hero-stats">
+            <div class="hero-stat"><strong>★★★★★</strong><span data-i18n="range">Range</span></div>
+            <div class="hero-stat"><strong>★★★☆☆</strong><span data-i18n="power">Power</span></div>
+            <div class="hero-stat"><strong>★★★★☆</strong><span data-i18n="speedStat">Speed</span></div>
+          </div>
+          <div class="skill-badge">
+            <div class="sb-icon">🍃</div>
+            <div><strong data-i18n="flipperSkill">GREEN FOCUS — Joint Time</strong><small data-i18n="flipperSkillDesc">Smokes, time slows & all towers +35% damage & +25% range for 6s. Premium focus.</small></div>
+          </div>
+        </div>
+      </div>
+      <!-- Jota -->
+      <div class="hero-card" data-hero="jota">
+        <div class="hero-visual">
+          <div class="char-jota" aria-hidden="true">
+            <div style="position:absolute;left:34px;top:12px;width:52px;height:48px;background:#e8c4a0;border:3px solid #000;border-radius:16px;overflow:hidden">
+              <div style="position:absolute;top:-2px;left:0;width:100%;height:18px;background:linear-gradient(180deg,#c9a87a,#e8c4a0);border-bottom:2px solid #000"></div>
+              <div style="position:absolute;top:16px;left:10px;width:10px;height:10px;background:#000;border-radius:50%"></div>
+              <div style="position:absolute;top:16px;right:10px;width:10px;height:10px;background:#000;border-radius:50%"></div>
+              <div style="position:absolute;top:30px;left:16px;width:20px;height:4px;background:#000;border-radius:2px"></div>
+              <div style="position:absolute;top:6px;left:18px;width:16px;height:6px;background:#000;border-radius:6px;opacity:.15"></div>
+            </div>
+            <div style="position:absolute;left:24px;top:58px;width:72px;height:46px;background:#ffd600;border:3px solid #000;border-radius:12px;display:grid;place-items:center;font-family:'Permanent Marker',cursive;font-size:14px;transform:rotate(-1deg)">BARRIO</div>
+            <div style="position:absolute;left:14px;top:66px;width:20px;height:30px;background:#e8c4a0;border:3px solid #000;border-radius:10px;transform:rotate(15deg)"></div>
+            <div style="position:absolute;right:14px;top:66px;width:20px;height:30px;background:#e8c4a0;border:3px solid #000;border-radius:10px;transform:rotate(-15deg)"></div>
+            <div style="position:absolute;left:30px;top:102px;width:20px;height:36px;background:#111;border:3px solid #000;border-radius:8px"></div>
+            <div style="position:absolute;right:30px;top:102px;width:20px;height:36px;background:#111;border:3px solid #000;border-radius:8px"></div>
+          </div>
+          <div class="street-tag">JOTA — BALD • BRICK • 1.75m</div>
+        </div>
+        <div class="hero-body">
+          <h3>JOTA <em>— THE WALL</em></h3>
+          <div class="subtitle" data-i18n="jotaSub">BALD • WIDE • MUSCULAR • 24</div>
+          <p data-i18n="jotaDesc">Shorter, twice as wide. Breakdance legend. One windmill clears the whole block.</p>
+          <div class="hero-stats">
+            <div class="hero-stat"><strong>★★★☆☆</strong><span data-i18n="range">Range</span></div>
+            <div class="hero-stat"><strong>★★★★★</strong><span data-i18n="power">Power</span></div>
+            <div class="hero-stat"><strong>★★★☆☆</strong><span data-i18n="speedStat">Speed</span></div>
+          </div>
+          <div class="skill-badge">
+            <div class="sb-icon" style="background:var(--magenta);color:#fff">🌀</div>
+            <div><strong data-i18n="jotaSkill">B-BOY CYCLONE — Break Kick</strong><small data-i18n="jotaSkillDesc">Breakdance spin — massive AoE damage + knocks enemies back down the street.</small></div>
+          </div>
+        </div>
+      </div>
+      <!-- Dboy -->
+      <div class="hero-card" data-hero="dboy">
+        <div class="hero-visual">
+          <div class="char-dboy" aria-hidden="true">
+            <div style="position:absolute;left:28px;top:10px;width:64px;height:52px;background:#ffdbac;border:3px solid #000;border-radius:16px;overflow:hidden">
+              <div style="position:absolute;top:-8px;left:6px;width:52px;height:22px;background:#1a1a1a;border:3px solid #000;border-radius:14px 14px 6px 6px"></div>
+              <div style="position:absolute;top:0;left:44px;width:20px;height:26px;background:#1a1a1a;border:2px solid #000;border-radius:0 12px 6px 0;transform:rotate(12deg)"></div>
+              <div style="position:absolute;top:18px;left:12px;width:8px;height:8px;background:#000;border-radius:50%"></div>
+              <div style="position:absolute;top:18px;right:12px;width:8px;height:8px;background:#000;border-radius:50%"></div>
+              <div style="position:absolute;top:30px;left:18px;width:28px;height:10px;background:#ff6a00;border:2px solid #000;border-radius:6px;display:grid;place-items:center;font-size:7px;font-family:'Russo One',sans-serif;color:#000">MÜSLI</div>
+            </div>
+            <div style="position:absolute;left:20px;top:60px;width:80px;height:48px;background:linear-gradient(180deg,#2a2a2a,#111);border:3px solid #000;border-radius:14px"></div>
+            <div style="position:absolute;left:8px;top:68px;width:22px;height:28px;background:#ffdbac;border:3px solid #000;border-radius:10px;transform:rotate(10deg)"></div>
+            <div style="position:absolute;right:8px;top:68px;width:22px;height:28px;background:#ffdbac;border:3px solid #000;border-radius:10px;transform:rotate(-10deg)"></div>
+            <div style="position:absolute;left:32px;top:106px;width:18px;height:22px;background:#333;border:3px solid #000;border-radius:8px"></div>
+            <div style="position:absolute;right:32px;top:106px;width:18px;height:22px;background:#333;border:3px solid #000;border-radius:8px"></div>
+            <div style="position:absolute;left:44px;top:70px;width:32px;height:32px;background:#ffd600;border:2px solid #000;border-radius:50%;display:grid;place-items:center;font-size:14px">🥣</div>
+          </div>
+          <div class="street-tag">D-BOY — 1.50m • 1.40m WIDE</div>
+        </div>
+        <div class="hero-body">
+          <h3>D-BOY <em>— THE BARREL</em></h3>
+          <div class="subtitle" data-i18n="dboySub">SCHMALZLOCKE • COMPACT • 21</div>
+          <p data-i18n="dboyDesc">Half a meter tall, almost as wide. Eats muesli and turns into an unstoppable rolling barrel.</p>
+          <div class="hero-stats">
+            <div class="hero-stat"><strong>★★☆☆☆</strong><span data-i18n="range">Range</span></div>
+            <div class="hero-stat"><strong>★★★★☆</strong><span data-i18n="power">Power</span></div>
+            <div class="hero-stat"><strong>★★★★★</strong><span data-i18n="speedStat">Speed</span></div>
+          </div>
+          <div class="skill-badge">
+            <div class="sb-icon" style="background:var(--cyan)">🥣</div>
+            <div><strong data-i18n="dboySkill">MÜSLI ROLL — Barrel Mode</strong><small data-i18n="dboySkillDesc">Curl into a giant muesli barrel and roll down the street crushing everyone.</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:14px 16px;background:#000;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-top:3px solid #222">
+      <p style="margin:0;font-size:12px;color:#888;max-width:520px" data-i18n="chooseNote">Each Pleb has a unique ultimate and passive. You can’t change mid-run. This is premium — street tested 2003.</p>
+      <button class="btn btn-primary" id="startBtn" style="min-width:160px;font-size:15px;padding:12px 18px">▶ <span data-i18n="startGame">START BLOCK PARTY</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- Game over / Victory -->
+<div class="modal" id="endModal">
+  <div class="modal-card" style="max-width:560px">
+    <div class="modal-head" style="justify-content:center;text-align:center">
+      <h2 id="endTitle" style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:3px">GAME OVER</h2>
+    </div>
+    <div class="result-wrap">
+      <p id="endDesc">The block was overrun. The cops took the street.</p>
+      <div class="big-score" id="endScore">WAVE 7 • 42 KILLS • 860 GOLD</div>
+      <p style="margin-top:12px;color:#777;font-size:12px" id="endFlavor">“Shoulda placed more Snipers on the corner, homie.” — Jota</p>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap">
+        <button class="btn btn-primary" id="restartBtn">↻ <span data-i18n="restart">RESTART</span></button>
+        <button class="btn btn-dark" id="changePlebBtn" data-i18n="changePleb">CHANGE PLEB</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center;padding:10px 0 18px;color:#555;font-family:'Russo One',sans-serif;font-size:10px;letter-spacing:1px">3 PLEBS — PREMIUM STREET DEFENSE • BUILT FOR THE BLOCK • NO FREE-TO-PLAY BS • © 2003-2010 RETRO</div>
+
+<script>
+/* ========== I18N ========== */
+const i18n = {
+  en: {
+    lives:"LIVES", gold:"GOLD", wave:"WAVE", shop:"CORNER SHOP", speed:"SPEED", shopHelp:"Pick a tower, then click a free concrete tile. Right-click to cancel. Towers need street cred (gold).",
+    nextWave:"NEXT WAVE", sell:"SELL", waveProgress:"PROGRESS", squad:"YOUR PLEB", kills:"KILLS", wavesDone:"WAVES", nextEnemies:"NEXT ENEMIES", howTo:"HOW TO BLOCK", how1:"<strong style='color:#fff'>Buy</strong> a tower from the left. Each has different range & cost.", how2:"<strong style='color:#fff'>Place</strong> on grey concrete — not on the orange street path.", how3:"<strong style='color:#fff'>Upgrade</strong> click a tower → boost Damage or Fire Rate. Use your Pleb’s ultimate!",
+    chooseHelp:"PICK ONE — EACH CHANGES THE GAME", flipperSub:"TALL • ATHLETIC • ORANGE HAIR • 22", flipperDesc:"Skater vibe, sees three blocks ahead. Rolls a little green to get laser focused.", jotaSub:"BALD • WIDE • MUSCULAR • 24", jotaDesc:"Shorter, twice as wide. Breakdance legend. One windmill clears the whole block.", dboySub:"POMPADOUR • COMPACT • 21", dboyDesc:"Half a meter tall, almost as wide. Eats muesli and turns into an unstoppable rolling barrel.",
+    flipperSkill:"GREEN FOCUS — Joint Time", flipperSkillDesc:"Smokes, time slows & all towers +35% damage & +25% range for 6s. Premium focus.", jotaSkill:"B-BOY CYCLONE — Break Kick", jotaSkillDesc:"Breakdance spin — massive AoE damage + knocks enemies back down the street.", dboySkill:"MÜSLI ROLL — Barrel Mode", dboySkillDesc:"Curl into a giant muesli barrel and roll down the street crushing everyone.",
+    range:"Range", power:"Power", speedStat:"Speed", chooseNote:"Each Pleb has a unique ultimate and passive. You can’t change mid-run. This is premium — street tested 2003.", startGame:"START BLOCK PARTY",
+    damage:"DMG", fireRate:"RATE", upDamage:"UP DAMAGE", upRate:"UP RATE", clickEmpty:"Click empty street to deselect",
+    restart:"RESTART", changePleb:"CHANGE PLEB",
+    // towers
+    tower_spray_name:"TAGGER", tower_spray_desc:"Cheap & fast. Low damage, short range. Tags everything.",
+    tower_boom_name:"BOOMBOX", tower_boom_desc:"Bass blast. Medium AoE + slows enemies 25%.",
+    tower_sniper_name:"ROOFTOP", tower_sniper_desc:"Sniper on the roof. Huge range, big damage, slow fire.",
+    tower_brawler_name:"B-BOY", tower_brawler_desc:"Meaty brawler. Short range, heavy splash. Lives for crowds.",
+    // skill names for HUD
+    skill_flipper_name:"GREEN FOCUS", skill_flipper_desc:"+35% DMG 6s • SLOW MO",
+    skill_jota_name:"B-BOY CYCLONE", skill_jota_desc:"AOE KICK + KNOCKBACK",
+    skill_dboy_name:"MÜSLI ROLL", skill_dboy_desc:"ROLL & CRUSH",
+    tip_flipper:"Tip: Flipper’s Focus boosts snipers insanely. Place Rooftops on corners for full coverage.",
+    tip_jota:"Tip: Jota’s Cyclone saves you when the street is full. Time it for big waves.",
+    tip_dboy:"Tip: D-Boy’s Barrel loves long straights — it crushes everything in its path.",
+    gameOverTitle:"BLOCK LOST", gameOverDesc:"The block was overrun. The cops took the street.",
+    victoryTitle:"BLOCK SECURED!", victoryDesc:"You held the barrio for 15 waves. Legends are born on this street.",
+    wave:"Wave",
+    heroes: { flipper: "FLIPPER — The Hawk", jota:"JOTA — The Wall", dboy:"D-BOY — The Barrel" },
+    heroDesc: { flipper:"Tall & athletic, orange hair. Sees everything from the rooftop.", jota:"Bald, wide & muscular. Breakdance king.", dboy:"Half-meter wide barrel. Pompadour + muesli power." }
+  },
+  es: {
+    lives:"VIDAS", gold:"ORO", wave:"OLEADA", shop:"TIENDA DEL BARRIO", speed:"VELOCIDAD", shopHelp:"Elige una torre y colócala en el cemento libre. Clic derecho para cancelar. Necesitas oro.",
+    nextWave:"SIGUIENTE OLEADA", sell:"VENDER", waveProgress:"PROGRESO", squad:"TU PLEB", kills:"BAJAS", wavesDone:"OLEADAS", nextEnemies:"PRÓXIMOS ENEMIGOS", howTo:"CÓMO BLOQUEAR", how1:"<strong style='color:#fff'>Compra</strong> una torre a la izquierda. Cada una tiene distinto alcance y coste.", how2:"<strong style='color:#fff'>Coloca</strong> en el cemento gris — no en la calle naranja.", how3:"<strong style='color:#fff'>Mejora</strong> haz clic en una torre → aumenta Daño o Cadencia. ¡Usa el ultimate de tu Pleb!",
+    chooseHelp:"ELIGE UNO — CADA UNO CAMBIA EL JUEGO", flipperSub:"ALTO • ATLÉTICO • PELO NARANJA • 22", flipperDesc:"Vibe skater, ve tres calles adelante. Se fuma uno y entra en foco láser.", jotaSub:"CALVO • ANCHO • MUSCULOSO • 24", jotaDesc:"Más bajo, el doble de ancho. Leyenda del break. Un windmill limpia la calle.", dboySub:"TUPÉ • COMPACTO • 21", dboyDesc:"Medio metro alto, casi igual de ancho. Come muesli y se vuelve un barril imparable.",
+    flipperSkill:"FOCO VERDE — Tiempo Joint", flipperSkillDesc:"Fuma, el tiempo se ralentiza y todas las torres +35% daño y +25% alcance 6s.", jotaSkill:"CICLÓN B-BOY — Patada Break", jotaSkillDesc:"Giro breakdance — daño en área enorme + empuja enemigos hacia atrás.", dboySkill:"BARRIL MÜSLI — Modo Rodar", dboySkillDesc:"Se enrolla en un barril gigante de muesli y arrolla la calle aplastando a todos.",
+    range:"Alcance", power:"Potencia", speedStat:"Velocidad", chooseNote:"Cada Pleb tiene ultimate y pasiva únicos. No puedes cambiar a mitad de partida. Premium — probado en la calle 2003.", startGame:"EMPEZAR FIESTA",
+    damage:"DAÑO", fireRate:"CADENCIA", upDamage:"↑ DAÑO", upRate:"↑ CADENCIA", clickEmpty:"Clic en calle vacía para deseleccionar",
+    restart:"REINICIAR", changePleb:"CAMBIAR PLEB",
+    tower_spray_name:"GRAFITERO", tower_spray_desc:"Barato y rápido. Poco daño, corto alcance. Taggea todo.",
+    tower_boom_name:"ALTAVOZ", tower_boom_desc:"Explosión de bajos. Daño en área + ralentiza 25%.",
+    tower_sniper_name:"AZOTEA", tower_sniper_desc:"Francotirador en la azotea. Alcance enorme, daño grande, disparo lento.",
+    tower_brawler_name:"B-BOY", tower_brawler_desc:"Peleón carnoso. Alcance corto, salpicadura pesada. Ama multitudes.",
+    skill_flipper_name:"FOCO VERDE", skill_flipper_desc:"+35% DAÑO 6s • CÁMARA LENTA",
+    skill_jota_name:"CICLÓN B-BOY", skill_jota_desc:"PATADA ÁREA + EMPUJE",
+    skill_dboy_name:"RODADA MÜSLI", skill_dboy_desc:"RODAR Y APLASTAR",
+    tip_flipper:"Tip: El Foco de Flipper potencia a los francotiradores. Pon Azoteas en las esquinas.",
+    tip_jota:"Tip: El Ciclón de Jota te salva cuando la calle está llena. Úsalo en oleadas grandes.",
+    tip_dboy:"Tip: El Barril de D-Boy ama las rectas largas — aplasta todo a su paso.",
+    gameOverTitle:"BARRIO PERDIDO", gameOverDesc:"La calle fue invadida. La policía tomó el barrio.",
+    victoryTitle:"¡BARRIO ASEGURADO!", victoryDesc:"Aguantaste 15 oleadas. Las leyendas nacen en esta calle.",
+    wave:"Oleada",
+    heroes: { flipper: "FLIPPER — El Halcón", jota:"JOTA — El Muro", dboy:"D-BOY — El Barril" },
+    heroDesc: { flipper:"Alto y atlético, pelo naranja. Lo ve todo desde la azotea.", jota:"Calvo, ancho y musculoso. Rey del break.", dboy:"Barril de medio metro. Tupé + poder muesli." }
+  },
+  de: {
+    lives:"LEBEN", gold:"GOLD", wave:"WELLE", shop:"ECKLADEN", speed:"SPEED", shopHelp:"Wähle einen Turm, klicke dann auf freies Betonfeld. Rechtsklick zum Abbrechen. Brauchst Gold.",
+    nextWave:"NÄCHSTE WELLE", sell:"VERKAUFEN", waveProgress:"FORTSCHRITT", squad:"DEIN PLEB", kills:"KILLS", wavesDone:"WELLEN", nextEnemies:"NÄCHSTE GEGNER", howTo:"SO BLOCKST DU", how1:"<strong style='color:#fff'>Kaufe</strong> links einen Turm. Jeder hat andere Reichweite & Kosten.", how2:"<strong style='color:#fff'>Platziere</strong> auf grauem Beton — nicht auf der orangen Straße.", how3:"<strong style='color:#fff'>Upgrade</strong> klick auf Turm → Schaden oder Feuerrate erhöhen. Nutze dein Pleb-Ultimate!",
+    chooseHelp:"WÄHLE EINEN — JEDER ÄNDERT DAS SPIEL", flipperSub:"GROSS • ATHLETISCH • ORANGE HAARE • 22", flipperDesc:"Skater-Vibe, sieht drei Blocks weit. Raucht einen und wird laserfokussiert.", jotaSub:"GLATZE • BREIT • MUSKULÖS • 24", jotaDesc:"Kleiner, doppelt so breit. Breakdance-Legende. Ein Windmill räumt die Straße.", dboySub:"SCHMALZLOCKE • KOMPAKT • 21", dboyDesc:"Halber Meter groß, fast so breit. Isst Müsli und wird zur rollenden Walze.",
+    flipperSkill:"GREEN FOCUS — Joint Time", flipperSkillDesc:"Raucht, Zeitlupe & alle Türme +35% Schaden & +25% Reichweite für 6s.", jotaSkill:"B-BOY CYCLONE — Break Kick", jotaSkillDesc:"Breakdance-Spin — massiver Flächenschaden + wirft Gegner zurück.", dboySkill:"MÜSLI ROLL — Walzen-Modus", dboySkillDesc:"Rollt sich zum Riesen-Müsli-Fass und walzt die Straße nieder.",
+    range:"Reichweite", power:"Power", speedStat:"Tempo", chooseNote:"Jeder Pleb hat einzigartiges Ultimate und Passiv. Kein Wechsel mid-run. Premium — street getestet 2003.", startGame:"BLOCK PARTY STARTEN",
+    damage:"SCHADEN", fireRate:"RATE", upDamage:"↑ SCHADEN", upRate:"↑ RATE", clickEmpty:"Auf leere Straße klicken zum Abwählen",
+    restart:"NEUSTART", changePleb:"PLEB WECHSELN",
+    tower_spray_name:"SPRAYER", tower_spray_desc:"Billig & schnell. Wenig Schaden, kurze Reichweite. Taggt alles.",
+    tower_boom_name:"BOOMBOX", tower_boom_desc:"Bass-Blast. Flächen-Schaden + 25% Slow.",
+    tower_sniper_name:"DACH", tower_sniper_desc:"Sniper auf dem Dach. Riesen-Reichweite, hoher Schaden, langsam.",
+    tower_brawler_name:"B-BOY", tower_brawler_desc:"Fleischiger Brawler. Kurze Reichweite, schwerer Splash. Liebt Massen.",
+    skill_flipper_name:"GREEN FOCUS", skill_flipper_desc:"+35% DMG 6s • ZEITLUPE",
+    skill_jota_name:"B-BOY CYCLONE", skill_jota_desc:"FLÄCHEN-KICK + RÜCKSTOSS",
+    skill_dboy_name:"MÜSLI WALZE", skill_dboy_desc:"ROLLEN & ZERQUETSCHEN",
+    tip_flipper:"Tipp: Flippers Fokus boostet Sniper wahnsinnig. Platziere DACH an Ecken.",
+    tip_jota:"Tipp: Jotas Cyclone rettet dich wenn die Straße voll ist. Timing bei großen Wellen!",
+    tip_dboy:"Tipp: D-Boys Walze liebt lange Geraden — walzt alles platt.",
+    gameOverTitle:"BLOCK VERLOREN", gameOverDesc:"Der Block wurde überrannt. Die Bullen haben die Straße.",
+    victoryTitle:"BLOCK GESICHERT!", victoryDesc:"Du hast 15 Wellen gehalten. Legenden werden auf dieser Straße geboren.",
+    wave:"Welle",
+    heroes: { flipper: "FLIPPER — Der Falke", jota:"JOTA — Die Wand", dboy:"D-BOY — Die Walze" },
+    heroDesc: { flipper:"Groß & athletisch, orange Haare. Sieht alles vom Dach.", jota:"Glatze, breit & muskulös. Breakdance-König.", dboy:"Halber-Meter Walze. Schmalzlocke + Müsli-Power." }
+  }
+};
+let currentLang = 'en';
+function t(key){
+  const parts = key.split('.');
+  let cur = i18n[currentLang];
+  for(let p of parts){ if(cur[p]!==undefined) cur=cur[p]; else return key; }
+  return cur;
+}
+function applyLang(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k = el.getAttribute('data-i18n');
+    const val = t(k);
+    if(val.includes('<strong')) el.innerHTML = val; else el.textContent = val;
+  });
+  // shop names
+  renderShop();
+  updateHUD();
+  updateHeroRight();
+  updateSkillButton();
+}
+document.querySelectorAll('.lang-btn').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    const lang = b.dataset.lang || b.dataset.lang2;
+    if(!lang) return;
+    currentLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(x=>{
+      if((x.dataset.lang||x.dataset.lang2)===lang) x.classList.add('active'); else if(x.dataset.lang||x.dataset.lang2) {
+        // keep other lang group? simpler: activate matching lang across both groups
+        if((x.dataset.lang===lang) || (x.dataset.lang2===lang)) x.classList.add('active'); else x.classList.remove('active');
+      }
+    });
+    // fix double groups
+    document.querySelectorAll('[data-lang]').forEach(x=> x.classList.toggle('active', x.dataset.lang===lang));
+    document.querySelectorAll('[data-lang2]').forEach(x=> x.classList.toggle('active', x.dataset.lang2===lang));
+    applyLang();
+  });
+});
+
+/* ========== GAME CONFIG ========== */
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const MAX_WAVE = 15;
+const START_LIVES = 20;
+const START_GOLD = 250;
+let CELL = 64;
+let COLS = Math.floor(canvas.width / CELL);
+let ROWS = Math.floor(canvas.height / CELL);
+
+const towerTypes = [
+  { id:'spray', cost:65, range:115, dmg:13, rate:520, color:'#ff3b30', icon:'🎨', projColor:'#ff6a00', nameKey:'tower_spray_name', descKey:'tower_spray_desc' },
+  { id:'boom', cost:105, range:135, dmg:22, rate:900, color:'#00e5ff', icon:'🔊', projColor:'#00e5ff', nameKey:'tower_boom_name', descKey:'tower_boom_desc' },
+  { id:'sniper', cost:145, range:210, dmg:48, rate:1400, color:'#ffd600', icon:'🎯', projColor:'#ffd600', nameKey:'tower_sniper_name', descKey:'tower_sniper_desc' },
+  { id:'brawler', cost:90, range:92, dmg:32, rate:740, color:'#ff006a', icon:'👊', projColor:'#ff006a', nameKey:'tower_brawler_name', descKey:'tower_brawler_desc' },
+];
+
+let state = {
+  lives: START_LIVES,
+  gold: START_GOLD,
+  wave: 1,
+  kills: 0,
+  hero: 'flipper',
+  selectedTowerType: null,
+  selectedTower: null,
+  towers: [],
+  enemies: [],
+  projectiles: [],
+  particles: [],
+  spawnQueue: [],
+  spawnTimer: 0,
+  waveInProgress: false,
+  waveProgress: 0,
+  timeScale: 1,
+  gameOver: false,
+  victory: false,
+  skillCooldown: 0,
+  skillMax: 20,
+  buffs: { flipper:0, dboyBarrel:null },
+  mouse: {x:0,y:0, gridX:-1, gridY:-1, inside:false},
+  hoverValid: false,
+};
+
+// hero configs
+const heroCfg = {
+  flipper:{ name:'FLIPPER', icon:'🦊', color:'#ff6a00', skillMax:22, passive:'range', desc:'+25% sniper range passively' },
+  jota:{ name:'JOTA', icon:'🧱', color:'#ffd600', skillMax:18, passive:'tank' },
+  dboy:{ name:'D-BOY', icon:'🥣', color:'#00e5ff', skillMax:20, passive:'gold' },
+};
+
+// path waypoints in grid coords (center of cells)
+const pathWaypoints = [
+  {x:-1, y:2.5},
+  {x:3, y:2.5},
+  {x:3, y:6.5},
+  {x:7, y:6.5},
+  {x:7, y:1.5},
+  {x:11, y:1.5},
+  {x:11, y:7.5},
+  {x:16, y:7.5},
+];
+let pathSegments = [];
+let totalPathLen = 0;
+function buildPath(){
+  pathSegments=[];
+  totalPathLen=0;
+  for(let i=0;i<pathWaypoints.length-1;i++){
+    const a=pathWaypoints[i], b=pathWaypoints[i+1];
+    const ax=a.x*CELL+CELL/2, ay=a.y*CELL+CELL/2;
+    const bx=b.x*CELL+CELL/2, by=b.y*CELL+CELL/2;
+    const len=Math.hypot(bx-ax, by-ay);
+    pathSegments.push({a:{x:ax,y:ay}, b:{x:bx,y:by}, len});
+    totalPathLen+=len;
+  }
+}
+buildPath();
+function getPosAlongPath(progress){
+  // progress 0..1 along total len
+  let dist = progress * totalPathLen;
+  for(let seg of pathSegments){
+    if(dist <= seg.len){
+      const t = seg.len? dist/seg.len : 0;
+      return { x: seg.a.x + (seg.b.x-seg.a.x)*t, y: seg.a.y + (seg.b.y-seg.a.y)*t, seg };
+    }
+    dist -= seg.len;
+  }
+  const last = pathSegments[pathSegments.length-1];
+  return {x:last.b.x, y:last.b.y};
+}
+function isPathCell(gx,gy){
+  // if cell center within 0.85*cell of path
+  const cx=gx*CELL+CELL/2, cy=gy*CELL+CELL/2;
+  for(let seg of pathSegments){
+    // distance point to segment
+    const px=cx, py=cy;
+    const ax=seg.a.x, ay=seg.a.y, bx=seg.b.x, by=seg.b.y;
+    const l2 = (bx-ax)**2 + (by-ay)**2;
+    let t = ((px-ax)*(bx-ax)+(py-ay)*(by-ay))/l2;
+    t=Math.max(0,Math.min(1,t));
+    const projx=ax+t*(bx-ax), projy=ay+t*(by-ay);
+    const d=Math.hypot(px-projx, py-projy);
+    if(d < CELL*0.62) return true;
+  }
+  return false;
+}
+
+/* ========== UI RENDERING ========== */
+function renderShop(){
+  const body=document.getElementById('shopBody');
+  body.innerHTML='';
+  towerTypes.forEach(tp=>{
+    const div=document.createElement('div');
+    const canAfford = state.gold >= tp.cost;
+    const isSel = state.selectedTowerType===tp.id;
+    div.className='shop-item'+(isSel?' selected':'')+(!canAfford?' disabled':'');
+    div.dataset.id=tp.id;
+    div.innerHTML=`
+      <div class="shop-icon" style="background:linear-gradient(180deg,${tp.color}22, #000);border-color:${isSel?tp.color:'#333'}">${tp.icon}</div>
+      <div class="shop-meta">
+        <h4>${t(tp.nameKey)} <span style="float:right;color:${tp.color};font-size:11px">${tp.range}${currentLang==='en'?' rng':' rng'}</span></h4>
+        <p>${t(tp.descKey)}</p>
+        <div class="row">
+          <span class="price">● ${tp.cost}</span>
+          <span class="range-dot">◉ ${tp.dmg} DMG • ${(1000/tp.rate).toFixed(1)}/s</span>
+        </div>
+      </div>
+    `;
+    div.onclick=()=>{
+      if(state.gold < tp.cost) {
+        shake(div); return;
+      }
+      state.selectedTowerType = (state.selectedTowerType===tp.id? null: tp.id);
+      state.selectedTower=null;
+      updateSelectionUI();
+      renderShop();
+    };
+    body.appendChild(div);
+  });
+}
+function shake(el){
+  el.animate([{transform:'translateX(0)'},{transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'translateX(0)'}],{duration:200});
+}
+function updateHUD(){
+  document.getElementById('livesVal').textContent=state.lives;
+  document.getElementById('goldVal').textContent=state.gold;
+  document.getElementById('waveVal').textContent=`${state.wave} / ${MAX_WAVE}`;
+  document.getElementById('waveProgress').style.width = `${state.waveProgress*100}%`;
+  document.getElementById('statKills').textContent=state.kills;
+  document.getElementById('statWaves').textContent=`${Math.max(0,state.wave-1)}/${MAX_WAVE}`;
+  // next wave label
+  const cfg = getWaveConfig(state.wave);
+  document.getElementById('nextWaveLabel').textContent = `${cfg.count}× ${cfg.name}`;
+  // dots
+  const dots=document.getElementById('waveDots');
+  dots.innerHTML='';
+  for(let i=1;i<=MAX_WAVE;i++){
+    const d=document.createElement('div');
+    d.className='wave-dot'+(i < state.wave?' done': i===state.wave?' current':'')+(i%5===0?' boss':'');
+    d.textContent=i;
+    dots.appendChild(d);
+  }
+}
+function updateHeroRight(){
+  const h=state.hero;
+  document.getElementById('heroNameRight').textContent=heroCfg[h].name;
+  document.getElementById('avatarRight').textContent= heroCfg[h].icon;
+  document.getElementById('rightHeroTitle').textContent = t(`heroes.${h}`);
+  document.getElementById('rightHeroDesc').textContent = t(`heroDesc.${h}`);
+  const tipId = h==='flipper'?'tip_flipper': h==='jota'?'tip_jota':'tip_dboy';
+  document.getElementById('tipText').textContent = t(tipId);
+}
+function updateSkillButton(){
+  const h=state.hero;
+  const cfg=heroCfg[h];
+  const nameEl=document.getElementById('skillName');
+  const descEl=document.getElementById('skillDesc');
+  const iconEl=document.getElementById('skillIcon');
+  const langKey = h==='flipper'?'skill_flipper_name':h==='jota'?'skill_jota_name':'skill_dboy_name';
+  const descKey = h==='flipper'?'skill_flipper_desc':h==='jota'?'skill_jota_desc':'skill_dboy_desc';
+  nameEl.textContent = t(langKey);
+  descEl.textContent = t(descKey);
+  iconEl.textContent = cfg.icon;
+  iconEl.style.background = cfg.color;
+  const cdEl=document.getElementById('skillCooldown');
+  if(state.skillCooldown>0){
+    cdEl.style.display='grid';
+    cdEl.textContent = Math.ceil(state.skillCooldown)+'s';
+    document.getElementById('skillBtn').disabled=true;
+  } else {
+    cdEl.style.display='none';
+    document.getElementById('skillBtn').disabled=false;
+  }
+}
+function updateSelectionUI(){
+  const sel = state.selectedTower;
+  const selInfo=document.getElementById('selectedInfo');
+  const defInfo=document.getElementById('defaultInfo');
+  const sellBtn=document.getElementById('sellBtn');
+  if(sel){
+    selInfo.style.display='block';
+    defInfo.style.display='none';
+    sellBtn.style.display='inline-flex';
+    const tp=towerTypes.find(x=>x.id===sel.type);
+    document.getElementById('selTowerName').textContent = t(tp.nameKey);
+    document.getElementById('selTowerLvl').textContent = `Lv.${sel.lvlDmg+sel.lvlRate+1}`;
+    document.getElementById('selTowerDesc').textContent = t(tp.descKey);
+    // stats with buff
+    const buffDmg = state.buffs.flipper>0?1.35:1;
+    const dmg = Math.round((tp.dmg + sel.lvlDmg* Math.round(tp.dmg*0.45)) * buffDmg);
+    const rateMul = 1 - sel.lvlRate*0.18;
+    const effRate = tp.rate * rateMul / (state.buffs.flipper>0?1.15:1); // flipper also faster?
+    const rps = (1000/effRate).toFixed(1);
+    document.getElementById('statDmg').textContent = dmg;
+    document.getElementById('statRate').textContent = rps+'/s';
+    document.getElementById('barDmg').style.width = `${Math.min(100, 25+ sel.lvlDmg*25)}%`;
+    document.getElementById('barRate').style.width = `${Math.min(100, 25+ sel.lvlRate*25)}%`;
+    // costs
+    const costDmg = sel.lvlDmg>=3? 'MAX' : (60+ sel.lvlDmg*40);
+    const costRate= sel.lvlRate>=3? 'MAX' : (60+ sel.lvlRate*40);
+    document.getElementById('upDmgCost').textContent = costDmg==='MAX'? 'MAX': costDmg+'₵';
+    document.getElementById('upRateCost').textContent = costRate==='MAX'? 'MAX': costRate+'₵';
+    document.getElementById('upDmgBtn').disabled = sel.lvlDmg>=3 || state.gold < costDmg;
+    document.getElementById('upRateBtn').disabled= sel.lvlRate>=3|| state.gold < costRate;
+    renderShop(); // to keep selection
+  } else {
+    selInfo.style.display='none';
+    defInfo.style.display='block';
+    sellBtn.style.display='none';
+  }
+}
+
+/* ========== CANVAS DRAW ========== */
+function drawBackground(){
+  // concrete tiles
+  ctx.fillStyle='#151518';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  // grid concrete
+  ctx.strokeStyle='rgba(255,255,255,.03)';
+  ctx.lineWidth=1;
+  for(let x=0;x<canvas.width;x+=CELL){
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke();
+  }
+  for(let y=0;y<canvas.height;y+=CELL){
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke();
+  }
+  // path - street
+  ctx.save();
+  // shadow under path
+  ctx.fillStyle='#0a0a0a';
+  ctx.beginPath();
+  // build thick path polygon by stroking line segments thick
+  ctx.lineCap='round'; ctx.lineJoin='round';
+  ctx.lineWidth=CELL*1.12;
+  ctx.strokeStyle='#0a0a0a';
+  ctx.beginPath();
+  ctx.moveTo(pathSegments[0].a.x, pathSegments[0].a.y);
+  pathSegments.forEach(s=> ctx.lineTo(s.b.x, s.b.y));
+  ctx.stroke();
+  // street asphalt
+  ctx.lineWidth=CELL*0.92;
+  ctx.strokeStyle='#2b2b2e';
+  ctx.stroke();
+  // street orange center line with dashes
+  ctx.lineWidth=CELL*0.86;
+  ctx.strokeStyle='#ff6a00';
+  ctx.setLineDash([18,12]);
+  ctx.lineDashOffset= (Date.now()*0.05)%30;
+  ctx.stroke();
+  ctx.setLineDash([]);
+  // side lines white
+  ctx.lineWidth=CELL*0.92;
+  ctx.strokeStyle='rgba(255,255,255,.85)';
+  ctx.lineWidth=4;
+  ctx.beginPath();
+  // draw parallel lines approximating path? simplified: just draw outer border thin
+  // instead draw cell-based street tiles for detail
+  ctx.restore();
+  // road markings: zebra at start and end
+  const start = pathSegments[0].a;
+  const end = pathSegments[pathSegments.length-1].b;
+  drawZebra(start.x, start.y, pathSegments[0]);
+  drawZebra(end.x, end.y, pathSegments[pathSegments.length-1]);
+  // sidewalk dots
+  ctx.fillStyle='rgba(255,255,255,.04)';
+  for(let i=0;i<200;i++){
+    const x=(i*47)%canvas.width, y=(i*73)%canvas.height;
+    if(isPathCell(Math.floor(x/CELL), Math.floor(y/CELL))) continue;
+    ctx.fillRect(x,y,2,2);
+  }
+}
+function drawZebra(x,y,seg){
+  ctx.save();
+  ctx.translate(x,y);
+  const ang = Math.atan2(seg.b.y-seg.a.y, seg.b.x-seg.a.x);
+  ctx.rotate(ang);
+  ctx.fillStyle='white';
+  for(let i=-CELL*0.4;i<CELL*0.4;i+=10){
+    ctx.fillRect(-4,i,8,5);
+  }
+  ctx.restore();
+}
+function drawTowers(){
+  state.towers.forEach(t=>{
+    const tp=towerTypes.find(x=>x.id===t.type);
+    const x=t.x, y=t.y;
+    // range circle if selected
+    if(state.selectedTower===t){
+      const effRange = getTowerRange(t);
+      ctx.beginPath();
+      ctx.arc(x,y,effRange,0,Math.PI*2);
+      ctx.fillStyle = tp.color+'18';
+      ctx.fill();
+      ctx.strokeStyle= tp.color+'66';
+      ctx.lineWidth=2;
+      ctx.setLineDash([6,6]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    // base shadow
+    ctx.fillStyle='rgba(0,0,0,.45)';
+    ctx.beginPath(); ctx.ellipse(x, y+18, 22, 10,0,0,Math.PI*2); ctx.fill();
+    // tower body
+    ctx.save();
+    ctx.translate(x,y);
+    // platform
+    ctx.fillStyle='#1a1a1e';
+    ctx.strokeStyle='#000';
+    ctx.lineWidth=3;
+    ctx.beginPath(); ctx.roundRect(-22,-22,44,44,10); ctx.fill(); ctx.stroke();
+    // inner color
+    ctx.fillStyle=tp.color;
+    ctx.beginPath(); ctx.roundRect(-18,-18,36,36,8); ctx.fill();
+    // icon
+    ctx.font='22px sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(tp.icon,0,-2);
+    // level pips
+    const lvl = t.lvlDmg + t.lvlRate;
+    ctx.fillStyle='#000';
+    for(let i=0;i<lvl;i++){
+      ctx.beginPath(); ctx.arc(-14 + i*7, 14, 3,0,Math.PI*2); ctx.fill();
+    }
+    ctx.fillStyle= tp.color;
+    for(let i=0;i<lvl;i++){
+      ctx.beginPath(); ctx.arc(-14 + i*7, 14, 1.8,0,Math.PI*2); ctx.fill();
+    }
+    // turret nozzle direction to target
+    if(t.targetAngle!==undefined){
+      ctx.rotate(t.targetAngle);
+      ctx.fillStyle='#000';
+      ctx.fillRect(10,-4,18,8);
+      ctx.fillStyle=tp.color;
+      ctx.fillRect(12,-2,14,4);
+    }
+    ctx.restore();
+    // health? no
+    // cooldown indicator
+    if(t.cooldown>0){
+      const pct = t.cooldown / getTowerRate(t);
+      ctx.fillStyle='rgba(0,0,0,.55)';
+      ctx.beginPath(); ctx.arc(x,y-26,10, -Math.PI/2, -Math.PI/2 + Math.PI*2*(1-pct)); ctx.lineTo(x,y-26); ctx.fill();
+    }
+  });
+  // ghost preview
+  if(state.selectedTowerType && state.mouse.inside){
+    const tp=towerTypes.find(x=>x.id===state.selectedTowerType);
+    const gx=state.mouse.gridX, gy=state.mouse.gridY;
+    const x=gx*CELL+CELL/2, y=gy*CELL+CELL/2;
+    const valid = isValidPlacement(gx,gy);
+    ctx.save();
+    ctx.globalAlpha=0.85;
+    // range
+    const effRange = getTowerRangePreview(tp);
+    ctx.beginPath(); ctx.arc(x,y,effRange,0,Math.PI*2);
+    ctx.fillStyle = valid ? tp.color+'22' : '#ff000022';
+    ctx.fill();
+    ctx.strokeStyle = valid ? tp.color+'88' : '#ff0000aa';
+    ctx.lineWidth=2; ctx.setLineDash([6,6]); ctx.stroke(); ctx.setLineDash([]);
+    // ghost tower
+    ctx.globalAlpha = valid?0.9:0.55;
+    ctx.translate(x,y);
+    ctx.fillStyle= valid? '#222' : '#400';
+    ctx.strokeStyle='#000'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.roundRect(-22,-22,44,44,10); ctx.fill(); ctx.stroke();
+    ctx.fillStyle= valid? tp.color : '#ff4444';
+    ctx.beginPath(); ctx.roundRect(-18,-18,36,36,8); ctx.fill();
+    ctx.font='22px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(tp.icon,0,-2);
+    // x mark if invalid
+    if(!valid){
+      ctx.strokeStyle='#fff'; ctx.lineWidth=3;
+      ctx.beginPath(); ctx.moveTo(-10,-10); ctx.lineTo(10,10); ctx.moveTo(10,-10); ctx.lineTo(-10,10); ctx.stroke();
+    }
+    ctx.restore();
+  }
+}
+function getTowerRange(t){
+  const tp=towerTypes.find(x=>x.id===t.type);
+  let r=tp.range;
+  if(state.hero==='flipper') r*=1.12; // passive
+  if(state.buffs.flipper>0) r*=1.25;
+  return r;
+}
+function getTowerRangePreview(tp){
+  let r=tp.range;
+  if(state.hero==='flipper') r*=1.12;
+  if(state.buffs.flipper>0) r*=1.25;
+  return r;
+}
+function getTowerDmg(t){
+  const tp=towerTypes.find(x=>x.id===t.type);
+  let dmg = tp.dmg + t.lvlDmg * Math.round(tp.dmg*0.45);
+  if(state.buffs.flipper>0) dmg = Math.round(dmg*1.35);
+  // Jota passive: brawler +15%
+  if(state.hero==='jota' && t.type==='brawler') dmg=Math.round(dmg*1.15);
+  return dmg;
+}
+function getTowerRate(t){
+  const tp=towerTypes.find(x=>x.id===t.type);
+  let rate = tp.rate * (1 - t.lvlRate*0.18);
+  if(state.buffs.flipper>0) rate/=1.18;
+  // Flipper passive: sniper -10%
+  if(state.hero==='flipper' && t.type==='sniper') rate*=0.90;
+  return rate;
+}
+function drawEnemies(){
+  state.enemies.forEach(e=>{
+    ctx.save();
+    ctx.translate(e.x,e.y);
+    // shadow
+    ctx.fillStyle='rgba(0,0,0,.35)';
+    ctx.beginPath(); ctx.ellipse(0,10,14,6,0,0,Math.PI*2); ctx.fill();
+    // body
+    const isBoss = e.isBoss;
+    const r = isBoss? 18: 12;
+    // outline
+    ctx.fillStyle='#000';
+    ctx.beginPath(); ctx.arc(0,0,r+2,0,Math.PI*2); ctx.fill();
+    // fill
+    const grad = ctx.createRadialGradient(-4,-4,2,0,0,r);
+    if(e.type==='fast'){ grad.addColorStop(0,'#aaff00'); grad.addColorStop(1,'#4a7a00'); }
+    else if(isBoss){ grad.addColorStop(0,'#ff4d6a'); grad.addColorStop(1,'#7a001a'); }
+    else { grad.addColorStop(0,'#ffcc00'); grad.addColorStop(1,'#ff6a00'); }
+    ctx.fillStyle=grad;
+    ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.fill();
+    // face angry
+    ctx.fillStyle='#000';
+    ctx.beginPath(); ctx.arc(-5,-3,2.5,0,Math.PI*2); ctx.arc(5,-3,2.5,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#000'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(-4,4); ctx.lineTo(4,4); ctx.stroke();
+    // boss crown
+    if(isBoss){
+      ctx.fillStyle='#ffd600'; ctx.strokeStyle='#000'; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(-10,-10); ctx.lineTo(-6,-16); ctx.lineTo(0,-11); ctx.lineTo(6,-16); ctx.lineTo(10,-10); ctx.closePath(); ctx.fill(); ctx.stroke();
+    }
+    // slow tint
+    if(e.slowTimer>0){
+      ctx.fillStyle='rgba(0,229,255,.25)';
+      ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+    // health bar
+    const barW = isBoss? 36: 26;
+    const barH=4;
+    const pct=e.hp/e.maxHp;
+    ctx.fillStyle='#000';
+    ctx.fillRect(e.x-barW/2-1, e.y - (isBoss?28:20)-1, barW+2, barH+2);
+    ctx.fillStyle='#222';
+    ctx.fillRect(e.x-barW/2, e.y - (isBoss?28:20), barW, barH);
+    ctx.fillStyle= pct>0.5? '#00e676' : pct>0.25? '#ffd600' : '#ff3b30';
+    ctx.fillRect(e.x-barW/2, e.y - (isBoss?28:20), barW*pct, barH);
+  });
+  // barrel
+  if(state.buffs.dboyBarrel){
+    const b=state.buffs.dboyBarrel;
+    ctx.save();
+    ctx.translate(b.x,b.y);
+    ctx.rotate(b.rot);
+    // barrel body
+    ctx.fillStyle='rgba(0,0,0,.3)';
+    ctx.beginPath(); ctx.ellipse(0,14,22,9,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#8d6e63';
+    ctx.strokeStyle='#000'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.ellipse(0,0,26,26,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='#ffd600';
+    ctx.beginPath(); ctx.ellipse(0,0,18,18,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='#000'; ctx.font='12px Russo One'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('MÜSLI',0,0);
+    // metal bands
+    ctx.strokeStyle='#333'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.arc(0,0,22,0,Math.PI*2); ctx.stroke();
+    ctx.restore();
+    // trail
+    ctx.fillStyle='rgba(255,214,0,.12)';
+    ctx.beginPath(); ctx.arc(b.x,b.y,34,0,Math.PI*2); ctx.fill();
+  }
+}
+function drawProjectiles(){
+  state.projectiles.forEach(p=>{
+    ctx.save();
+    ctx.translate(p.x,p.y);
+    ctx.rotate(p.angle||0);
+    ctx.fillStyle=p.color;
+    ctx.strokeStyle='#000'; ctx.lineWidth=1.5;
+    if(p.type==='boom'){
+      ctx.beginPath(); ctx.arc(0,0,6,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle='white';
+      ctx.beginPath(); ctx.arc(-1,-1,2,0,Math.PI*2); ctx.fill();
+    } else if(p.type==='sniper'){
+      ctx.fillRect(-8,-2,16,4);
+      ctx.fillStyle='#fff';
+      ctx.fillRect(4,-1,4,2);
+    } else if(p.type==='brawler'){
+      ctx.beginPath(); ctx.arc(0,0,5,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.arc(0,0,4,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    }
+    ctx.restore();
+    // trail
+    ctx.fillStyle=p.color+'44';
+    ctx.beginPath(); ctx.arc(p.x,p.y,3,0,Math.PI*2); ctx.fill();
+  });
+}
+function drawParticles(){
+  state.particles.forEach(pt=>{
+    ctx.globalAlpha = Math.max(0, pt.life/pt.maxLife);
+    ctx.fillStyle=pt.color;
+    ctx.beginPath(); ctx.arc(pt.x,pt.y,pt.r,0,Math.PI*2); ctx.fill();
+    if(pt.text){
+      ctx.font='bold 13px Russo One';
+      ctx.fillStyle='#ffd600';
+      ctx.strokeStyle='#000'; ctx.lineWidth=3;
+      ctx.textAlign='center';
+      ctx.strokeText(pt.text, pt.x, pt.y);
+      ctx.fillText(pt.text, pt.x, pt.y);
+    }
+    ctx.globalAlpha=1;
+  });
+}
+function drawGridHighlight(){
+  // draw grid on hover? already ghost does
+}
+
+/* ========== GAME LOGIC ========== */
+function getWaveConfig(w){
+  const baseCount = 7 + Math.floor(w*1.6);
+  const boss = w%5===0;
+  const name = boss? 'Boss + Crew' : w%3===0? 'Rushed Crew' : 'Street Grunts';
+  return {count: boss? baseCount+3 : baseCount, name, boss};
+}
+function queueWave(){
+  const cfg=getWaveConfig(state.wave);
+  state.spawnQueue=[];
+  for(let i=0;i<cfg.count;i++){
+    const isBoss = cfg.boss && i===0;
+    const isFast = !isBoss && (i%4===0 && state.wave>3);
+    state.spawnQueue.push({isBoss,isFast, delay: isBoss? 0 : isFast? 380 : 520});
+  }
+  state.spawnTimer=0;
+  state.waveInProgress=true;
+  state.waveProgress=0;
+}
+function isValidPlacement(gx,gy){
+  if(gx<0||gy<0||gx>=COLS||gy>=ROWS) return false;
+  if(isPathCell(gx,gy)) return false;
+  if(state.towers.some(t=> t.gridX===gx && t.gridY===gy)) return false;
+  return true;
+}
+function placeTower(gx,gy){
+  const tp=towerTypes.find(x=>x.id===state.selectedTowerType);
+  if(!tp) return false;
+  if(state.gold < tp.cost) return false;
+  if(!isValidPlacement(gx,gy)) return false;
+  state.gold -= tp.cost;
+  const t={ x:gx*CELL+CELL/2, y:gy*CELL+CELL/2, gridX:gx, gridY:gy, type:tp.id, lvlDmg:0, lvlRate:0, cooldown:0, targetAngle:0 };
+  state.towers.push(t);
+  state.selectedTower = t;
+  updateSelectionUI();
+  updateHUD();
+  spawnParticles(t.x,t.y-10, 10, tp.color);
+  // sound
+  playSound('place');
+  return true;
+}
+function upgradeTower(t, kind){
+  const tp=towerTypes.find(x=>x.id===t.type);
+  if(kind==='dmg'){
+    if(t.lvlDmg>=3) return;
+    const cost=60+t.lvlDmg*40;
+    if(state.gold<cost) return;
+    state.gold-=cost; t.lvlDmg++;
+    spawnParticles(t.x,t.y-18,8,'#00e676', '+DMG');
+  } else {
+    if(t.lvlRate>=3) return;
+    const cost=60+t.lvlRate*40;
+    if(state.gold<cost) return;
+    state.gold-=cost; t.lvlRate++;
+    spawnParticles(t.x,t.y-18,8,'#00e5ff','+RATE');
+  }
+  updateHUD(); updateSelectionUI();
+  playSound('upgrade');
+}
+function sellTower(t){
+  const tp=towerTypes.find(x=>x.id===t.type);
+  const invested = tp.cost + t.lvlDmg*(60+(t.lvlDmg-1)*20) + t.lvlRate*(60+(t.lvlRate-1)*20); // rough
+  const refund = Math.floor(invested*0.6);
+  state.gold+=refund;
+  state.towers = state.towers.filter(x=>x!==t);
+  if(state.selectedTower===t) state.selectedTower=null;
+  spawnParticles(t.x,t.y,12,'#ffd600', `+${refund}₵`);
+  updateHUD(); updateSelectionUI(); renderShop();
+  playSound('sell');
+}
+
+function spawnParticles(x,y,count,color,text){
+  for(let i=0;i<count;i++){
+    const ang=Math.random()*Math.PI*2, sp= 30+Math.random()*90;
+    state.particles.push({
+      x,y, vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp -20,
+      r: 2+Math.random()*3, color, life:0.5+Math.random()*0.4, maxLife:0.5+Math.random()*0.4,
+      gravity: 180,
+    });
+  }
+  if(text){
+    state.particles.push({x,y:y-18, vx:0, vy:-30, r:0, color:'#fff', life:0.9, maxLife:0.9, text, gravity:0});
+  }
+}
+function playSound(kind){
+  try{
+    const ac = window._ac || (window._ac = new (window.AudioContext||window.webkitAudioContext)());
+    const o=ac.createOscillator(), g=ac.createGain();
+    o.connect(g); g.connect(ac.destination);
+    if(kind==='shoot'){ o.frequency.value= 800; g.gain.value=0.07; o.type='square'; g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime+0.12); o.start(); o.stop(ac.currentTime+0.12); }
+    else if(kind==='hit'){ o.frequency.value= 220; g.gain.value=0.12; o.type='sine'; g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime+0.18); o.start(); o.stop(ac.currentTime+0.18); }
+    else if(kind==='place'){ o.frequency.value= 440; g.gain.value=0.12; o.type='triangle'; g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime+0.2); o.start(); o.stop(ac.currentTime+0.2); }
+    else if(kind==='upgrade'){ o.frequency.value= 660; g.gain.value=0.15; o.type='sine'; g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime+0.3); o.start(); o.stop(ac.currentTime+0.3); }
+    else if(kind==='skill'){ o.frequency.value= 120; g.gain.value=0.2; o.type='sawtooth'; o.frequency.linearRampToValueAtTime(880, ac.currentTime+0.4); g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime+0.5); o.start(); o.stop(ac.currentTime+0.5); }
+    else if(kind==='sell'){ o.frequency.value= 300; g.gain.value=0.1; o.type='sine'; o.frequency.linearRampToValueAtTime(500, ac.currentTime+0.15); g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime+0.2); o.start(); o.stop(ac.currentTime+0.2); }
+  }catch(e){}
+}
+
+/* cooldowns & buffs */
+function activateSkill(){
+  if(state.skillCooldown>0 || state.gameOver) return;
+  const h=state.hero;
+  playSound('skill');
+  if(h==='flipper'){
+    state.buffs.flipper = 6.0;
+    state.timeScale = 0.55;
+    setTimeout(()=>{ state.timeScale = document.getElementById('speed2').classList.contains('active')?2:1; }, 900);
+    document.getElementById('focusOverlay').style.opacity='1';
+    setTimeout(()=> document.getElementById('focusOverlay').style.opacity='0', 5800);
+    spawnParticles(canvas.width/2, 100, 18, '#00e676', 'FOCUSED!');
+    // screen flash
+    canvas.style.filter='contrast(1.15) saturate(1.3)';
+    setTimeout(()=> canvas.style.filter='', 800);
+    state.skillCooldown = heroCfg.flipper.skillMax;
+  } else if(h==='jota'){
+    // AoE at center or at mouse if inside
+    const cx = state.mouse.inside? state.mouse.x : canvas.width/2;
+    const cy = state.mouse.inside? state.mouse.y : canvas.height/2;
+    let hits=0;
+    state.enemies.forEach(e=>{
+      const d=Math.hypot(e.x-cx, e.y-cy);
+      if(d< 200){
+        e.hp -= 95 + state.wave*6;
+        e.progress = Math.max(0, e.progress - 0.07); // knockback
+        e.slowTimer = 0.7;
+        hits++;
+      }
+    });
+    // particles shockwave
+    spawnParticles(cx,cy, 24, '#ff006a');
+    for(let i=0;i<3;i++) setTimeout(()=> spawnParticles(cx,cy, 10, '#ffd600'), i*120);
+    // visual wave
+    let waveR=0;
+    const waveAnim = setInterval(()=>{
+      waveR+=18;
+      ctx.save();
+      ctx.strokeStyle=`rgba(255,0,106,${1-waveR/220})`;
+      ctx.lineWidth=4;
+      ctx.beginPath(); ctx.arc(cx,cy,waveR,0,Math.PI*2); ctx.stroke();
+      ctx.restore();
+      if(waveR>220) clearInterval(waveAnim);
+    }, 30);
+    setTimeout(()=>clearInterval(waveAnim), 800);
+    spawnParticles(cx,cy-40, 1, '#fff', hits? `-${hits} HIT!` : 'WHIFF!');
+    canvas.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:300});
+    state.skillCooldown = heroCfg.jota.skillMax;
+  } else if(h==='dboy'){
+    // spawn barrel
+    state.buffs.dboyBarrel = { progress:0, x: pathSegments[0].a.x, y: pathSegments[0].a.y, rot:0, speed: 165 + state.wave*4, hitTimer:0 };
+    spawnParticles(state.buffs.dboyBarrel.x, state.buffs.dboyBarrel.y, 14, '#00e5ff', 'ROLLIN!');
+    state.skillCooldown = heroCfg.dboy.skillMax;
+  }
+  updateSkillButton();
+}
+
+/* ========== MAIN LOOP ========== */
+let lastTime=performance.now();
+function loop(now){
+  requestAnimationFrame(loop);
+  let dt = (now-lastTime)/1000;
+  lastTime=now;
+  dt *= state.timeScale;
+  if(state.gameOver){ draw(); return; }
+  update(dt);
+  draw();
+}
+function update(dt){
+  // cooldowns
+  if(state.skillCooldown>0){
+    state.skillCooldown = Math.max(0, state.skillCooldown - dt * (state.timeScale===2?1:1) ); // real time? use unscaled?
+    // Actually we already scaled dt, so skill should count real time regardless of speed. So add correction:
+    // But keep simple.
+    updateSkillButton();
+  }
+  if(state.buffs.flipper>0){
+    state.buffs.flipper = Math.max(0, state.buffs.flipper - dt);
+    if(state.buffs.flipper===0){
+      document.getElementById('focusOverlay').style.opacity='0';
+    }
+  }
+  // barrel update
+  if(state.buffs.dboyBarrel){
+    const b=state.buffs.dboyBarrel;
+    b.progress += (b.speed * dt) / totalPathLen;
+    b.rot += dt*10;
+    const pos=getPosAlongPath(b.progress);
+    b.x=pos.x; b.y=pos.y;
+    b.hitTimer -= dt;
+    if(b.hitTimer<=0){
+      b.hitTimer=0.16;
+      state.enemies.forEach(e=>{
+        if(Math.hypot(e.x-b.x, e.y-b.y) < 38){
+          e.hp -= 42;
+          e.slowTimer = 0.4;
+          spawnParticles(e.x,e.y,3,'#ffd600');
+        }
+      });
+    }
+    if(b.progress>=1){
+      spawnParticles(b.x,b.y,16,'#ffd600','CRASH!');
+      state.buffs.dboyBarrel=null;
+    }
+  }
+
+  // wave spawning
+  if(state.waveInProgress && state.spawnQueue.length>0){
+    state.spawnTimer -= dt*1000;
+    if(state.spawnTimer<=0){
+      const entry=state.spawnQueue.shift();
+      spawnEnemy(entry.isBoss, entry.isFast);
+      state.spawnTimer = entry.delay / state.timeScale;
+      state.waveProgress = 1 - state.spawnQueue.length / getWaveConfig(state.wave).count;
+      updateHUD();
+    }
+  }
+  // check wave complete
+  if(state.waveInProgress && state.spawnQueue.length===0 && state.enemies.length===0){
+    state.waveInProgress=false;
+    state.waveProgress=1;
+    updateHUD();
+    // reward
+    state.gold += 35 + state.wave*4;
+    if(state.hero==='dboy') state.gold += 12; // passive
+    // victory?
+    if(state.wave >= MAX_WAVE){
+      state.victory=true; state.gameOver=true;
+      showEnd(true);
+    } else {
+      state.wave++;
+      updateHUD();
+      // auto next wave button pulse if not auto
+      document.getElementById('nextWaveBtn').classList.add('next-wave-pulse');
+    }
+    updateHUD(); renderShop(); updateSelectionUI();
+  }
+
+  // enemies movement
+  for(let i=state.enemies.length-1;i>=0;i--){
+    const e=state.enemies[i];
+    let speed = e.speed;
+    if(e.slowTimer>0){ speed*=0.55; e.slowTimer-=dt; }
+    e.progress += (speed * dt) / totalPathLen;
+    const pos=getPosAlongPath(e.progress);
+    e.x=pos.x; e.y=pos.y;
+    if(e.progress>=1){
+      // reached end
+      state.lives -= e.isBoss? 3:1;
+      spawnParticles(e.x,e.y,10,'#ff3b30', '-♥');
+      state.enemies.splice(i,1);
+      updateHUD();
+      if(state.lives<=0){
+        state.lives=0; state.gameOver=true; showEnd(false);
+      }
+      canvas.animate([{filter:'brightness(1)'},{filter:'brightness(1.6)'}],{duration:120});
+    } else if(e.hp<=0){
+      // died
+      const goldGain = e.isBoss? 55 : e.type==='fast'? 14 : 10 + Math.floor(state.wave*0.7);
+      state.gold += goldGain;
+      state.kills++;
+      spawnParticles(e.x,e.y,12, e.isBoss?'#ff006a':'#ffd600', `+${goldGain}₵`);
+      playSound('hit');
+      state.enemies.splice(i,1);
+      updateHUD(); renderShop(); updateSelectionUI();
+    }
+  }
+
+  // towers shooting
+  state.towers.forEach(t=>{
+    if(t.cooldown>0) t.cooldown-= dt*1000;
+    if(t.cooldown<=0){
+      // find target
+      let best=null, bestDist=Infinity;
+      const range=getTowerRange(t);
+      for(let e of state.enemies){
+        const d=Math.hypot(e.x-t.x, e.y-t.y);
+        if(d<=range){
+          // prioritize progress (closest to end)
+          const score = -e.progress*1000 + d*0.01;
+          if(!best || e.progress > best.progress){
+            best=e; bestDist=d;
+          }
+        }
+      }
+      if(best){
+        t.targetAngle = Math.atan2(best.y - t.y, best.x - t.x);
+        t.cooldown = getTowerRate(t);
+        // spawn projectile
+        const dmg=getTowerDmg(t);
+        const tp=towerTypes.find(x=>x.id===t.type);
+        const proj={
+          x:t.x, y:t.y, tx:best.x, ty:best.y, target:best,
+          dmg, speed: tp.id==='sniper'? 820 : tp.id==='boom'? 420 : 560,
+          color:tp.projColor, type:tp.id, angle:t.targetAngle,
+          life:1.6
+        };
+        // brawler and boom have AoE: projectile still homes but on hit does AoE
+        state.projectiles.push(proj);
+        playSound('shoot');
+        // muzzle flash
+        spawnParticles(t.x + Math.cos(t.targetAngle)*18, t.y + Math.sin(t.targetAngle)*18, 3, tp.color);
+      }
+    }
+  });
+
+  // projectiles
+  for(let i=state.projectiles.length-1;i>=0;i--){
+    const p=state.projectiles[i];
+    // homing: update target position if target still alive
+    if(p.target && state.enemies.includes(p.target)){
+      p.tx = p.target.x; p.ty = p.target.y;
+      p.angle = Math.atan2(p.ty - p.y, p.tx - p.x);
+    }
+    const dx=p.tx - p.x, dy=p.ty - p.y;
+    const dist=Math.hypot(dx,dy);
+    const move = p.speed * dt;
+    if(dist <= move+6){
+      // hit
+      p.x=p.tx; p.y=p.ty;
+      // apply damage
+      if(p.type==='boom'){
+        // AoE 70 radius
+        let hitCount=0;
+        state.enemies.forEach(e=>{
+          if(Math.hypot(e.x-p.x, e.y-p.y) < 72){
+            e.hp -= p.dmg;
+            e.slowTimer = 1.1;
+            hitCount++;
+          }
+        });
+        spawnParticles(p.x,p.y,14,p.color);
+        // blast circle
+        state.particles.push({x:p.x,y:p.y, vx:0, vy:0, r:0, color:p.color, life:0.35, maxLife:0.35, gravity:0, blast:72});
+      } else if(p.type==='brawler'){
+        state.enemies.forEach(e=>{
+          if(Math.hypot(e.x-p.x, e.y-p.y) < 48){
+            e.hp -= p.dmg;
+          }
+        });
+        spawnParticles(p.x,p.y,10,p.color);
+      } else {
+        if(p.target && state.enemies.includes(p.target)){
+          p.target.hp -= p.dmg;
+          spawnParticles(p.x,p.y,6,p.color);
+        } else {
+          // find nearest at impact
+          let nearest=null, nd=Infinity;
+          state.enemies.forEach(e=>{
+            const d=Math.hypot(e.x-p.x,e.y-p.y);
+            if(d<nd){ nd=d; nearest=e;}
+          });
+          if(nearest && nd<40) nearest.hp-=p.dmg;
+        }
+      }
+      state.projectiles.splice(i,1);
+    } else {
+      p.x += Math.cos(p.angle)*move;
+      p.y += Math.sin(p.angle)*move;
+      p.life-=dt;
+      if(p.life<=0) state.projectiles.splice(i,1);
+    }
+  }
+
+  // particles
+  for(let i=state.particles.length-1;i>=0;i--){
+    const pt=state.particles[i];
+    pt.life-=dt;
+    if(pt.life<=0){ state.particles.splice(i,1); continue; }
+    pt.x += pt.vx*dt;
+    pt.y += pt.vy*dt;
+    if(pt.gravity) pt.vy += pt.gravity*dt;
+    if(pt.blast!==undefined){
+      // expanding blast visual handled in draw
+    }
+  }
+}
+
+function spawnEnemy(isBoss, isFast){
+  const hpBase = 32 + state.wave*14 + (state.wave*state.wave*1.1);
+  let hp = hpBase;
+  let speed = 48 + state.wave*1.4;
+  let type='normal';
+  if(isFast){ hp*=0.62; speed*=1.55; type='fast'; }
+  if(isBoss){ hp*=3.2; speed*=0.68; }
+  const e = {
+    x: pathSegments[0].a.x, y: pathSegments[0].a.y,
+    progress:0, hp, maxHp:hp, speed, type, isBoss:!!isBoss, slowTimer:0
+  };
+  state.enemies.push(e);
+}
+function draw(){
+  // clear
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  drawBackground();
+  // grid numbers faint
+  ctx.fillStyle='rgba(255,255,255,.025)';
+  ctx.font='10px Russo One';
+  for(let gx=0;gx<COLS;gx++) for(let gy=0;gy<ROWS;gy++){
+    // tiny dot
+  }
+  drawTowers();
+  drawEnemies();
+  drawProjectiles();
+  drawParticles();
+  // draw expanding blasts
+  state.particles.forEach(pt=>{
+    if(pt.blast!==undefined){
+      const prog = 1 - pt.life/pt.maxLife;
+      ctx.strokeStyle=`rgba(0,229,255,${1-prog})`;
+      ctx.lineWidth=3;
+      ctx.beginPath(); ctx.arc(pt.x,pt.y, pt.blast*prog,0,Math.PI*2); ctx.stroke();
+    }
+  });
+  // top highlight when buff
+  if(state.buffs.flipper>0){
+    ctx.fillStyle=`rgba(0,230,118,${0.07 + Math.sin(Date.now()*0.01)*0.04})`;
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+  }
+}
+
+/* ========== INPUT ========== */
+function canvasPos(e){
+  const rect=canvas.getBoundingClientRect();
+  const scaleX=canvas.width/rect.width, scaleY=canvas.height/rect.height;
+  const x=(e.clientX - rect.left)*scaleX;
+  const y=(e.clientY - rect.top)*scaleY;
+  return {x,y, gridX: Math.floor(x/CELL), gridY:Math.floor(y/CELL)};
+}
+canvas.addEventListener('mousemove', e=>{
+  const p=canvasPos(e);
+  state.mouse.x=p.x; state.mouse.y=p.y; state.mouse.gridX=p.gridX; state.mouse.gridY=p.gridY;
+  state.mouse.inside = p.x>=0&&p.y>=0&&p.x<canvas.width&&p.y<canvas.height;
+  state.hoverValid = isValidPlacement(p.gridX,p.gridY);
+  canvas.style.cursor = state.selectedTowerType? (state.hoverValid? 'copy':'not-allowed') : 'default';
+});
+canvas.addEventListener('mouseleave', ()=> state.mouse.inside=false);
+canvas.addEventListener('click', e=>{
+  if(state.gameOver) return;
+  const p=canvasPos(e);
+  // if we have a tower type selected -> try place
+  if(state.selectedTowerType){
+    if(placeTower(p.gridX,p.gridY)){
+      // keep selection? allow continuous placing but if not enough gold deselect
+      const tp=towerTypes.find(x=>x.id===state.selectedTowerType);
+      if(state.gold < tp.cost) state.selectedTowerType=null;
+      renderShop(); updateSelectionUI();
+    } else {
+      // check if clicking on existing tower -> select it instead?
+      const clicked = state.towers.find(t=> t.gridX===p.gridX && t.gridY===p.gridY);
+      if(clicked){ state.selectedTower=clicked; state.selectedTowerType=null; updateSelectionUI(); renderShop(); }
+    }
+  } else {
+    // select tower
+    const clicked = state.towers.find(t=> t.gridX===p.gridX && t.gridY===p.gridY);
+    if(clicked){
+      state.selectedTower=clicked;
+    } else {
+      state.selectedTower=null;
+    }
+    updateSelectionUI();
+  }
+});
+canvas.addEventListener('contextmenu', e=>{
+  e.preventDefault();
+  state.selectedTowerType=null;
+  state.selectedTower=null;
+  updateSelectionUI(); renderShop();
+});
+document.getElementById('skillBtn').addEventListener('click', activateSkill);
+document.addEventListener('keydown', e=>{
+  if(e.code==='Space'){ e.preventDefault(); activateSkill(); }
+  if(e.key==='Escape'){ state.selectedTowerType=null; state.selectedTower=null; updateSelectionUI(); renderShop(); }
+});
+document.getElementById('nextWaveBtn').addEventListener('click', ()=>{
+  if(!state.waveInProgress && !state.gameOver){
+    queueWave();
+    document.getElementById('nextWaveBtn').classList.remove('next-wave-pulse');
+    playSound('place');
+  }
+});
+document.getElementById('upDmgBtn').addEventListener('click', ()=>{
+  if(state.selectedTower) upgradeTower(state.selectedTower,'dmg');
+});
+document.getElementById('upRateBtn').addEventListener('click', ()=>{
+  if(state.selectedTower) upgradeTower(state.selectedTower,'rate');
+});
+document.getElementById('sellBtn').addEventListener('click', ()=>{
+  if(state.selectedTower) sellTower(state.selectedTower);
+});
+document.getElementById('speed1').addEventListener('click',()=>{
+  state.timeScale=1;
+  document.getElementById('speed1').classList.add('active');
+  document.getElementById('speed2').classList.remove('active');
+});
+document.getElementById('speed2').addEventListener('click',()=>{
+  state.timeScale=2;
+  document.getElementById('speed2').classList.add('active');
+  document.getElementById('speed1').classList.remove('active');
+});
+
+/* hero select */
+document.querySelectorAll('.hero-card').forEach(card=>{
+  card.addEventListener('click', ()=>{
+    document.querySelectorAll('.hero-card').forEach(c=>c.classList.remove('selected'));
+    card.classList.add('selected');
+    state.hero = card.dataset.hero;
+  });
+});
+document.getElementById('startBtn').addEventListener('click', ()=>{
+  const sel=document.querySelector('.hero-card.selected');
+  if(sel) state.hero=sel.dataset.hero;
+  document.getElementById('heroModal').classList.remove('open');
+  startGame();
+});
+function startGame(){
+  state.lives=START_LIVES;
+  state.gold=START_GOLD;
+  // hero passive gold bonus? Dboy starts with extra?
+  if(state.hero==='jota') state.gold+=20;
+  state.wave=1;
+  state.kills=0;
+  state.towers=[]; state.enemies=[]; state.projectiles=[]; state.particles=[];
+  state.spawnQueue=[]; state.waveInProgress=false; state.waveProgress=0;
+  state.selectedTower=null; state.selectedTowerType=null;
+  state.gameOver=false; state.victory=false;
+  state.skillCooldown=0;
+  state.buffs={flipper:0, dboyBarrel:null};
+  state.timeScale= document.getElementById('speed2').classList.contains('active')?2:1;
+  updateHeroRight(); updateHUD(); renderShop(); updateSelectionUI(); updateSkillButton();
+  queueWave();
+}
+function showEnd(victory){
+  const modal=document.getElementById('endModal');
+  modal.classList.add('open');
+  const title=document.getElementById('endTitle');
+  const desc=document.getElementById('endDesc');
+  const score=document.getElementById('endScore');
+  const flavor=document.getElementById('endFlavor');
+  if(victory){
+    title.textContent = t('victoryTitle');
+    title.style.color='var(--yellow)';
+    desc.textContent = t('victoryDesc');
+    flavor.textContent = '“The whole block chants your name — PLEBS FOREVER!” — Flipper';
+  } else {
+    title.textContent = t('gameOverTitle');
+    title.style.color='var(--magenta)';
+    desc.textContent = t('gameOverDesc');
+    flavor.textContent = '“Shoulda placed more Snipers on the corner, homie.” — Jota';
+  }
+  score.textContent = `${t('wave')} ${state.wave} • ${state.kills} ${t('kills')} • ${state.gold} GOLD`;
+  playSound('hit');
+}
+document.getElementById('restartBtn').addEventListener('click', ()=>{
+  document.getElementById('endModal').classList.remove('open');
+  startGame();
+});
+document.getElementById('changePlebBtn').addEventListener('click', ()=>{
+  document.getElementById('endModal').classList.remove('open');
+  document.getElementById('heroModal').classList.add('open');
+});
+
+/* responsive cell recalc */
+function resizeCanvasForDPR(){
+  // keep logical 960x560, but adapt cell if needed? fixed.
+}
+window.addEventListener('resize', ()=>{ /* handled via CSS scaling */ });
+
+/* init */
+updateHeroRight(); renderShop(); updateHUD(); updateSelectionUI(); updateSkillButton();
+buildPath();
+requestAnimationFrame(loop);
+// show tip based on hero later
+setInterval(()=>{ if(!state.gameOver) draw(); }, 100); // ensure draw even without loop? loop already
+
+// prevent context menu on canvas wrap
+document.getElementById('canvasWrap').addEventListener('contextmenu', e=>e.preventDefault());
+
+/* auto start with Flipper for preview, but keep modal open until user starts */
+</script>
+</body>
+</html>
