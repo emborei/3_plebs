@@ -1,0 +1,14 @@
+Metadata-Version: 2.4
+Name: survivors-buddy
+Version: 0.1.0
+Summary: External screen-driven Vampire Survivors prototype
+Requires-Python: >=3.11
+Requires-Dist: mss>=9.0
+Requires-Dist: numpy>=1.26
+Requires-Dist: opencv-python-headless<5,>=4.9
+Requires-Dist: Pillow>=10.0
+Requires-Dist: pytesseract>=0.3.10
+Requires-Dist: vgamepad>=0.1.0
+Requires-Dist: PySide6>=6.7
+Requires-Dist: onnxruntime>=1.18
+Requires-Dist: pywin32>=306; sys_platform == "win32"

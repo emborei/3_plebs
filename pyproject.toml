@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "survivors-buddy"
+version = "0.1.0"
+description = "External screen-driven Vampire Survivors prototype"
+requires-python = ">=3.11"
+dependencies = [
+  "mss>=9.0",
+  "numpy>=1.26",
+  "opencv-python-headless>=4.9,<5",
+  "Pillow>=10.0",
+  "pytesseract>=0.3.10",
+  "vgamepad>=0.1.0",
+  "PySide6>=6.7",
+  "onnxruntime>=1.18",
+  "pywin32>=306; sys_platform == 'win32'",
+]
+
+[project.scripts]
+survivors-buddy = "survivors_bot.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

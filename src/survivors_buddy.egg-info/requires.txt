@@ -1,0 +1,11 @@
+mss>=9.0
+numpy>=1.26
+opencv-python-headless<5,>=4.9
+Pillow>=10.0
+pytesseract>=0.3.10
+vgamepad>=0.1.0
+PySide6>=6.7
+onnxruntime>=1.18
+
+[:sys_platform == "win32"]
+pywin32>=306

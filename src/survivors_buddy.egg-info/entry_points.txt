@@ -1,0 +1,2 @@
+[console_scripts]
+survivors-buddy = survivors_bot.__main__:main

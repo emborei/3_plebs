@@ -1,0 +1,53 @@
+name: Windows portable package
+
+on:
+  push:
+    branches:
+      - arena/01a0e8d9-3-plebs
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'packaging/**'
+      - 'pyproject.toml'
+      - 'requirements.txt'
+      - '.github/workflows/windows-package.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out session branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install Tesseract OCR
+        shell: pwsh
+        run: choco install tesseract --yes --no-progress
+
+      - name: Run tests
+        shell: pwsh
+        run: |
+          py -3.11 -m pip install -r requirements.txt
+          py -3.11 -m pytest -q
+
+      - name: Build DirectML + CPU-fallback package
+        shell: pwsh
+        run: .\packaging\build_windows.ps1 -Backend DirectML -TesseractDir 'C:\Program Files\Tesseract-OCR'
+
+      - name: Upload portable application
+        uses: actions/upload-artifact@v4
+        with:
+          name: SurvivorsBuddy-Windows-DirectML
+          path: dist/SurvivorsBuddy-Windows.zip
+          if-no-files-found: error
+          retention-days: 14
