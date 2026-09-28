@@ -19,7 +19,7 @@ permissions:
 jobs:
   test-and-build:
     runs-on: windows-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Check out session branch
         uses: actions/checkout@v4
@@ -34,11 +34,13 @@ jobs:
         shell: pwsh
         run: choco install tesseract --yes --no-progress
 
+      - name: Install lightweight test dependencies
+        shell: pwsh
+        run: py -3.11 -m pip install --prefer-binary pytest numpy 'opencv-python-headless<5' onnxruntime pytesseract mss Pillow
+
       - name: Run tests
         shell: pwsh
-        run: |
-          py -3.11 -m pip install -r requirements.txt
-          py -3.11 -m pytest -q
+        run: py -3.11 -m pytest -q
 
       - name: Build DirectML + CPU-fallback package
         shell: pwsh
