@@ -24,7 +24,7 @@ if ($Stage -in @('All', 'Install')) {
         # Reuse those packages rather than redownloading them into a second venv.
         Write-Host "Installing only the Windows packaging extras and $Backend runtime into runner Python"
         Invoke-PythonChecked @('-m', 'pip', 'uninstall', '-y', 'onnxruntime', 'onnxruntime-gpu', 'onnxruntime-directml')
-        $BuildPackages = @('PySide6', 'vgamepad', 'pywin32', 'pyinstaller')
+        $BuildPackages = @('PySide6-Essentials', 'vgamepad', 'pywin32', 'pyinstaller')
         if ($Backend -eq 'CPU') { $BuildPackages += 'onnxruntime' }
         if ($Backend -eq 'CUDA') { $BuildPackages += 'onnxruntime-gpu' }
         if ($Backend -eq 'DirectML') { $BuildPackages += 'onnxruntime-directml' }
