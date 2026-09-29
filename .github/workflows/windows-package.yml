@@ -19,7 +19,7 @@ permissions:
 jobs:
   test-and-build:
     runs-on: windows-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - name: Check out session branch
         uses: actions/checkout@v4
@@ -42,10 +42,20 @@ jobs:
         shell: pwsh
         run: py -3.11 -m pytest -q
 
-      - name: Build DirectML + CPU-fallback package
-        timeout-minutes: 35
+      - name: Install DirectML build dependencies
+        timeout-minutes: 20
         shell: pwsh
-        run: .\packaging\build_windows.ps1 -Backend DirectML -TesseractDir 'C:\Program Files\Tesseract-OCR'
+        run: .\packaging\build_windows.ps1 -Stage Install -Backend DirectML
+
+      - name: Package Windows executable
+        timeout-minutes: 20
+        shell: pwsh
+        run: .\packaging\build_windows.ps1 -Stage Package -Backend DirectML
+
+      - name: Assemble portable package
+        timeout-minutes: 10
+        shell: pwsh
+        run: .\packaging\build_windows.ps1 -Stage Archive -Backend DirectML -TesseractDir 'C:\Program Files\Tesseract-OCR'
 
       - name: Upload portable application
         uses: actions/upload-artifact@v4
