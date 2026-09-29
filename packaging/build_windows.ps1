@@ -3,7 +3,8 @@ param(
     [string]$Backend = 'DirectML',
     [ValidateSet('All', 'Install', 'Package', 'Archive')]
     [string]$Stage = 'All',
-    [string]$TesseractDir = $env:TESSERACT_INSTALL_DIR
+    [string]$TesseractDir = $env:TESSERACT_INSTALL_DIR,
+    [switch]$UseRunnerPython
 )
 $ErrorActionPreference = 'Stop'
 $Repo = Split-Path -Parent $PSScriptRoot
@@ -12,31 +13,44 @@ $VenvPython = Join-Path $Repo '.venv\Scripts\python.exe'
 
 function Invoke-PythonChecked {
     param([string[]]$Arguments)
-    & $VenvPython @Arguments
+    if ($UseRunnerPython) { & py -3.11 @Arguments }
+    else { & $VenvPython @Arguments }
     if ($LASTEXITCODE -ne 0) { throw "Python command failed ($LASTEXITCODE): $($Arguments -join ' ')" }
 }
 
 if ($Stage -in @('All', 'Install')) {
-    if (-not (Test-Path '.venv')) {
-        Write-Host 'Creating Python 3.11 virtual environment'
-        py -3.11 -m venv .venv
-        if ($LASTEXITCODE -ne 0) { throw 'Could not create Python 3.11 virtual environment.' }
-    }
-    if (-not (Test-Path $VenvPython)) { throw "Python executable not found: $VenvPython" }
-    Write-Host "Installing $Backend build dependencies"
-    Invoke-PythonChecked @('-m', 'pip', 'uninstall', '-y', 'onnxruntime', 'onnxruntime-gpu', 'onnxruntime-directml')
-    Invoke-PythonChecked @('-m', 'pip', 'install', '--upgrade', 'pip')
-    Invoke-PythonChecked @('-m', 'pip', 'install', '-r', 'requirements.txt', 'pyinstaller')
-    if ($Backend -ne 'CPU') {
-        Invoke-PythonChecked @('-m', 'pip', 'uninstall', '-y', 'onnxruntime')
-        if ($Backend -eq 'CUDA') { Invoke-PythonChecked @('-m', 'pip', 'install', 'onnxruntime-gpu') }
-        if ($Backend -eq 'DirectML') { Invoke-PythonChecked @('-m', 'pip', 'install', 'onnxruntime-directml') }
+    if ($UseRunnerPython) {
+        # CI already installed and tested the core requirements in its base Python.
+        # Reuse those packages rather than redownloading them into a second venv.
+        Write-Host "Installing only the Windows packaging extras and $Backend runtime into runner Python"
+        Invoke-PythonChecked @('-m', 'pip', 'uninstall', '-y', 'onnxruntime', 'onnxruntime-gpu', 'onnxruntime-directml')
+        $BuildPackages = @('PySide6', 'vgamepad', 'pywin32', 'pyinstaller')
+        if ($Backend -eq 'CPU') { $BuildPackages += 'onnxruntime' }
+        if ($Backend -eq 'CUDA') { $BuildPackages += 'onnxruntime-gpu' }
+        if ($Backend -eq 'DirectML') { $BuildPackages += 'onnxruntime-directml' }
+        Invoke-PythonChecked (@('-m', 'pip', 'install', '--prefer-binary') + $BuildPackages)
+    } else {
+        if (-not (Test-Path '.venv')) {
+            Write-Host 'Creating Python 3.11 virtual environment'
+            py -3.11 -m venv .venv
+            if ($LASTEXITCODE -ne 0) { throw 'Could not create Python 3.11 virtual environment.' }
+        }
+        if (-not (Test-Path $VenvPython)) { throw "Python executable not found: $VenvPython" }
+        Write-Host "Installing $Backend build dependencies"
+        Invoke-PythonChecked @('-m', 'pip', 'uninstall', '-y', 'onnxruntime', 'onnxruntime-gpu', 'onnxruntime-directml')
+        Invoke-PythonChecked @('-m', 'pip', 'install', '--upgrade', 'pip')
+        Invoke-PythonChecked @('-m', 'pip', 'install', '-r', 'requirements.txt', 'pyinstaller')
+        if ($Backend -ne 'CPU') {
+            Invoke-PythonChecked @('-m', 'pip', 'uninstall', '-y', 'onnxruntime')
+            if ($Backend -eq 'CUDA') { Invoke-PythonChecked @('-m', 'pip', 'install', 'onnxruntime-gpu') }
+            if ($Backend -eq 'DirectML') { Invoke-PythonChecked @('-m', 'pip', 'install', 'onnxruntime-directml') }
+        }
     }
     Write-Host 'Dependencies installed.'
 }
 
 if ($Stage -in @('All', 'Package')) {
-    if (-not (Test-Path $VenvPython)) { throw 'Run Stage=Install before Stage=Package.' }
+    if (-not $UseRunnerPython -and -not (Test-Path $VenvPython)) { throw 'Run Stage=Install before Stage=Package.' }
     Write-Host 'Running PyInstaller; this can take several minutes on a fresh runner.'
     Invoke-PythonChecked @('-m', 'PyInstaller', '--noconfirm', '--clean', '--windowed', '--name', 'SurvivorsBuddy', '--paths', 'src', '--collect-all', 'onnxruntime', '--collect-all', 'pytesseract', '--hidden-import', 'vgamepad', '--hidden-import', 'win32gui', 'packaging/launcher.py')
     if (-not (Test-Path (Join-Path $Repo 'dist\SurvivorsBuddy\SurvivorsBuddy.exe'))) {
