@@ -43,6 +43,7 @@ jobs:
         run: py -3.11 -m pytest -q
 
       - name: Build DirectML + CPU-fallback package
+        timeout-minutes: 35
         shell: pwsh
         run: .\packaging\build_windows.ps1 -Backend DirectML -TesseractDir 'C:\Program Files\Tesseract-OCR'
 
