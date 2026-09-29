@@ -1,7 +1,7 @@
 param(
     [ValidateSet('CPU', 'CUDA', 'DirectML')]
     [string]$Backend = 'DirectML',
-    [ValidateSet('All', 'Install', 'Package', 'Archive')]
+    [ValidateSet('All', 'Install', 'Desktop', 'Runtime', 'Package', 'Archive')]
     [string]$Stage = 'All',
     [string]$TesseractDir = $env:TESSERACT_INSTALL_DIR,
     [switch]$UseRunnerPython
@@ -16,6 +16,19 @@ function Invoke-PythonChecked {
     if ($UseRunnerPython) { & py -3.11 @Arguments }
     else { & $VenvPython @Arguments }
     if ($LASTEXITCODE -ne 0) { throw "Python command failed ($LASTEXITCODE): $($Arguments -join ' ')" }
+}
+
+if ($UseRunnerPython -and $Stage -eq 'Desktop') {
+    Write-Host 'Installing Windows UI, virtual gamepad, and packaging tools'
+    Invoke-PythonChecked @('-m', 'pip', 'install', '--prefer-binary', 'PySide6-Essentials', 'vgamepad', 'pywin32', 'pyinstaller')
+}
+
+if ($UseRunnerPython -and $Stage -eq 'Runtime') {
+    Write-Host "Installing the $Backend inference runtime"
+    Invoke-PythonChecked @('-m', 'pip', 'uninstall', '-y', 'onnxruntime', 'onnxruntime-gpu', 'onnxruntime-directml')
+    if ($Backend -eq 'CPU') { Invoke-PythonChecked @('-m', 'pip', 'install', '--prefer-binary', 'onnxruntime') }
+    if ($Backend -eq 'CUDA') { Invoke-PythonChecked @('-m', 'pip', 'install', '--prefer-binary', 'onnxruntime-gpu') }
+    if ($Backend -eq 'DirectML') { Invoke-PythonChecked @('-m', 'pip', 'install', '--prefer-binary', 'onnxruntime-directml') }
 }
 
 if ($Stage -in @('All', 'Install')) {

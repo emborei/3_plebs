@@ -19,7 +19,7 @@ permissions:
 jobs:
   test-and-build:
     runs-on: windows-latest
-    timeout-minutes: 65
+    timeout-minutes: 85
     steps:
       - name: Check out session branch
         uses: actions/checkout@v4
@@ -42,10 +42,15 @@ jobs:
         shell: pwsh
         run: py -3.11 -m pytest -q
 
-      - name: Install DirectML build dependencies
-        timeout-minutes: 25
+      - name: Install Windows UI and packaging dependencies
+        timeout-minutes: 20
         shell: pwsh
-        run: .\packaging\build_windows.ps1 -Stage Install -Backend DirectML -UseRunnerPython
+        run: .\packaging\build_windows.ps1 -Stage Desktop -Backend DirectML -UseRunnerPython
+
+      - name: Install DirectML inference runtime
+        timeout-minutes: 20
+        shell: pwsh
+        run: .\packaging\build_windows.ps1 -Stage Runtime -Backend DirectML -UseRunnerPython
 
       - name: Package Windows executable
         timeout-minutes: 25
