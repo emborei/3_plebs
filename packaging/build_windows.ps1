@@ -19,8 +19,10 @@ function Invoke-PythonChecked {
 }
 
 if ($UseRunnerPython -and $Stage -eq 'Desktop') {
-    Write-Host 'Installing Windows UI, virtual gamepad, and packaging tools'
-    Invoke-PythonChecked @('-m', 'pip', 'install', '--prefer-binary', 'PySide6-Essentials', 'vgamepad', 'pywin32', 'pyinstaller')
+    Write-Host 'Installing Windows UI and packaging tools'
+    Invoke-PythonChecked @('-m', 'pip', 'install', '--prefer-binary', 'PySide6-Essentials', 'pywin32', 'pyinstaller')
+    Write-Host 'Installing vgamepad bindings without starting its privileged MSI driver prompt'
+    Invoke-PythonChecked @('packaging/install_vgamepad.py')
 }
 
 if ($UseRunnerPython -and $Stage -eq 'Runtime') {
@@ -53,6 +55,7 @@ if ($Stage -in @('All', 'Install')) {
         Invoke-PythonChecked @('-m', 'pip', 'uninstall', '-y', 'onnxruntime', 'onnxruntime-gpu', 'onnxruntime-directml')
         Invoke-PythonChecked @('-m', 'pip', 'install', '--upgrade', 'pip')
         Invoke-PythonChecked @('-m', 'pip', 'install', '-r', 'requirements.txt', 'pyinstaller')
+        Invoke-PythonChecked @('packaging/install_vgamepad.py')
         if ($Backend -ne 'CPU') {
             Invoke-PythonChecked @('-m', 'pip', 'uninstall', '-y', 'onnxruntime')
             if ($Backend -eq 'CUDA') { Invoke-PythonChecked @('-m', 'pip', 'install', 'onnxruntime-gpu') }

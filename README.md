@@ -29,8 +29,11 @@ py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 pip install -e .
+python packaging/install_vgamepad.py
 survivors-buddy
 ```
+
+The vgamepad helper downloads the pinned Python bindings but deliberately does **not** launch the package's interactive ViGEmBus MSI installer. Install the ViGEmBus driver separately before starting a controller session; this avoids surprise administrator prompts.
 
 The default ONNX Runtime install is CPU. For an optional GPU provider, replace that package **rather than installing multiple providers together**:
 

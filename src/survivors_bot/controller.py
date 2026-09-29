@@ -9,7 +9,7 @@ class XboxController:
         try:
             import vgamepad as vg
         except ImportError as exc:
-            raise RuntimeError("Install requirements.txt and ViGEmBus before running the bot") from exc
+            raise RuntimeError("Install the vgamepad bindings with packaging/install_vgamepad.py and install the ViGEmBus driver before running the bot") from exc
         self.vg = vg
         self.pad = vg.VX360Gamepad()
 
